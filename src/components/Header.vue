@@ -29,8 +29,10 @@
         <li v-for="tab in tabsList"
             :key="tab.id"
             class="tab-link"
-            @click="onTabChange(tab.id)"
-            :class="{ 'active-tab': activeTab === tab.id }">{{tab.name}}</li>
+            @click="onTabChange(tab.url)"
+            :class="{ 'active-tab': currentUrl === tab.url }">
+            <router-link :to="tab.url">{{tab.name}}</router-link>
+            </li>
       </ul>
     </div>
   </header>
@@ -42,26 +44,32 @@ export default Vue.extend({
   name: 'Header',
   data () {
     return {
+      currentUrl: '',
       tabsList: [
         {
           name: 'Tasks',
-          id: 1
+          id: 1,
+          url: '/tasks'
         },
         {
           name: 'Kanban',
-          id: 2
+          id: 2,
+          url: '/kanban'
         },
         {
           name: 'Activity',
-          id: 3
+          id: 3,
+          url: '/activity'
         },
         {
           name: 'Calendar',
-          id: 4
+          id: 4,
+          url: '/calendar'
         },
         {
           name: 'Files',
-          id: 5
+          id: 5,
+          url: '/files'
         }
       ],
       users: [
@@ -85,10 +93,12 @@ export default Vue.extend({
     }
   },
   methods: {
-    onTabChange (id: number) {
-      this.activeTab = id
-      this.$emit('onTabChange', id)
+    onTabChange (url: string) {
+      this.currentUrl = url
     }
+  },
+  created () {
+    this.currentUrl = window.location.pathname
   }
 })
 </script>
@@ -173,15 +183,20 @@ header{
             li + li {
                 margin-left: 27px;
             }
-            .tab-link{
+            .tab-link a{
                 color: $dark;
                 opacity: .7;
                 padding-bottom: 14px;
                 cursor: pointer;
+                text-decoration: none;
+                padding-bottom: 7px;
+                display: block;
             }
             .active-tab{
-                opacity: 1;
                 border-bottom: 2px solid $yellow;
+                a {
+                  opacity: 1;
+                }
             }
         }
     }

@@ -7,7 +7,29 @@ const routes: Array<RouteConfig> = [
   {
     path: '/',
     name: 'Home',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Activity.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/Home.vue'),
+    children: [
+      {
+        path: '/tasks',
+        component: () => import('../components/Tasks.vue')
+      },
+      {
+        path: '/activity',
+        component: () => import('../components/Activity.vue')
+      },
+      {
+        path: '/kanban',
+        component: () => import('../components/Kanban.vue')
+      },
+      {
+        path: '/calendar',
+        component: () => import('../components/Calendar.vue')
+      },
+      {
+        path: '/files',
+        component: () => import('../components/Files.vue')
+      }
+    ]
   }
 ]
 

@@ -75,7 +75,7 @@
 import Vue from 'vue'
 
 export default Vue.extend({
-  name: 'aside',
+  name: 'AsideBar',
   props: ['notification'],
   methods: {
     completeTask () {

@@ -1,40 +1,36 @@
 <template>
-  <div class='container'>
-    <AsideBar :notification="notificationsCount"/>
-    <!-- /#aside -->
-    <div class='main-block'>
-      <Header/>
-      <main>
-        <div class='tab-content'>
-          <router-view/>
+  <div class='tab-item active-item'>
+    <div class='tab-title'>Today</div>
+    <div class="wrap-helper" v-for="message in messages" :key="message.id">
+        <div class='tab-section'>
+            <div class='tab-desc'>
+                <div class='icon icon-approve' v-if="message.type == messageType.MARK"></div>
+                <div class='icon icon-mess' v-if="message.type == messageType.COMMENT"></div>
+                <div class='icon icon-upload' v-if="message.type == messageType.CONTENT"></div>
+                <p v-if="message.type != messageType.SYSTEM">{{message.text}}</p>
+            </div>
+            <div  v-if="message.type != messageType.SYSTEM" class='activity-time'>{{ formatDate(message.createdAt) }}</div>
         </div>
-      </main>
+        <div class='mess-body' v-if="message.type == messageType.SYSTEM">{{message.text}}</div>
+        <div class='upload-files' v-if="message.type == messageType.CONTENT && message.images.length">
+            <div class="img-wrap" v-for="(img, index) in message.images" :key="index" @click="notificationsCount = index">
+                <img :src="img">
+            </div>
+        </div>
     </div>
-    <!-- /.main-block -->
   </div>
 </template>
 
 <script lang='ts'>
-import Header from '@/components/Header.vue'
-import AsideBar from '@/components/AsideBar.vue'
 import formatDate from '@/mixins/formatDate'
 import MessageType from '@/core/enums/message-type.enum'
-import Tasks from '@/components/Tasks.vue'
-import Activity from '@/components/Activity.vue'
 
 export default formatDate.extend({
-  name: 'Home',
+  name: 'Activity',
   mixins: [formatDate],
-  components: {
-    Header,
-    AsideBar,
-    Tasks,
-    Activity
-  },
   data () {
     return {
       messageType: MessageType,
-      notificationsCount: 2,
       messages: [
         {
           type: 'mark',
@@ -178,99 +174,99 @@ export default formatDate.extend({
     }
   }
 }
-@media only screen and (max-width: 1050px) {
-  .tab-content {
-    width: 80%;
-  }
-}
-@media only screen and (max-width: 992px) {
-  #aside {
-    position: fixed;
-    top: 0;
-    left: -255px;
-    z-index: 9;
-    .btn-menu {
-      display: block;
-    }
-  }
-}
-@media only screen and (max-width: 750px) {
-  header {
-    .top-header {
-      flex-direction: column;
-      .social-wrap {
-        margin-top: 15px;
-        display: flex;
-        justify-content: space-between;
-      }
-    }
-  }
-}
-@media only screen and (max-width: 580px) {
-  .tab-content {
-    width: 90%;
-    margin-left: 10px;
-    .tab-item {
-      .mess-body,
-      .upload-files {
-        margin: 20px 40px 0;
-      }
-    }
-  }
-}
-@media only screen and (max-width: 425px) {
-  header {
-    .top-header {
-      .task-title-wrap {
-        .task-title {
-          font-size: 25px;
-        }
-      }
-    }
-    .tabs-section {
-      ul li + li {
-        margin-left: 10px;
-      }
-    }
-  }
-}
-@media only screen and (max-width: 390px) {
-  header {
-    .top-header {
-      .task-title-wrap {
-        .task-title {
-          font-size: 17px;
-        }
-      }
-      .social-wrap {
-        flex-direction: column;
-        .users-section {
-          margin-bottom: 15px;
-          margin-right: 0;
-        }
-      }
-    }
-    .tabs-section {
-      display: flex;
-      justify-content: center;
-      li {
-        font-size: 14px;
-      }
-      ul li + li {
-        margin-left: 7px;
-      }
-    }
-  }
-  .tab-content {
-    padding: 30px 25px 90px;
-    .tab-item {
-      .mess-body {
-        margin: 20px 20px 0;
-      }
-      .tab-section {
-        flex-direction: column;
-      }
-    }
-  }
-}
+// @media only screen and (max-width: 1050px) {
+//   .tab-content {
+//     width: 80%;
+//   }
+// }
+// @media only screen and (max-width: 992px) {
+//   #aside {
+//     position: fixed;
+//     top: 0;
+//     left: -255px;
+//     z-index: 9;
+//     .btn-menu {
+//       display: block;
+//     }
+//   }
+// }
+// @media only screen and (max-width: 750px) {
+//   header {
+//     .top-header {
+//       flex-direction: column;
+//       .social-wrap {
+//         margin-top: 15px;
+//         display: flex;
+//         justify-content: space-between;
+//       }
+//     }
+//   }
+// }
+// @media only screen and (max-width: 580px) {
+//   .tab-content {
+//     width: 90%;
+//     margin-left: 10px;
+//     .tab-item {
+//       .mess-body,
+//       .upload-files {
+//         margin: 20px 40px 0;
+//       }
+//     }
+//   }
+// }
+// @media only screen and (max-width: 425px) {
+//   header {
+//     .top-header {
+//       .task-title-wrap {
+//         .task-title {
+//           font-size: 25px;
+//         }
+//       }
+//     }
+//     .tabs-section {
+//       ul li + li {
+//         margin-left: 10px;
+//       }
+//     }
+//   }
+// }
+// @media only screen and (max-width: 390px) {
+//   header {
+//     .top-header {
+//       .task-title-wrap {
+//         .task-title {
+//           font-size: 17px;
+//         }
+//       }
+//       .social-wrap {
+//         flex-direction: column;
+//         .users-section {
+//           margin-bottom: 15px;
+//           margin-right: 0;
+//         }
+//       }
+//     }
+//     .tabs-section {
+//       display: flex;
+//       justify-content: center;
+//       li {
+//         font-size: 14px;
+//       }
+//       ul li + li {
+//         margin-left: 7px;
+//       }
+//     }
+//   }
+//   .tab-content {
+//     padding: 30px 25px 90px;
+//     .tab-item {
+//       .mess-body {
+//         margin: 20px 20px 0;
+//       }
+//       .tab-section {
+//         flex-direction: column;
+//       }
+//     }
+//   }
+// }
 </style>
