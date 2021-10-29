@@ -13,7 +13,7 @@
         </div>
         <div class='mess-body' v-if="message.type == messageType.SYSTEM">{{message.text}}</div>
         <div class='upload-files' v-if="message.type == messageType.CONTENT && message.images.length">
-            <div class="img-wrap" v-for="(img, index) in message.images" :key="index" @click="onImageClick(index)">
+            <div class="img-wrap" v-for="(img, index) in message.images" :key="index" @click="$emit('selectedImg', index)">
                 <img :src="img">
             </div>
         </div>
@@ -61,11 +61,6 @@ export default formatDate.extend({
           id: 4
         }
       ]
-    }
-  },
-  methods: {
-    onImageClick (index: number) {
-      this.$emit('selectedImg', index)
     }
   }
 })
