@@ -6,7 +6,7 @@
       <Header/>
       <main>
         <div class='tab-content'>
-          <router-view/>
+          <router-view @selectedImg="notificationsCount = $event"/>
         </div>
       </main>
     </div>
