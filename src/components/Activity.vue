@@ -1,34 +1,29 @@
-<template>
-  <div class='tab-item active-item'>
-    <div class='tab-title'>Today</div>
-    <div class="wrap-helper" v-for="message in messages" :key="message.id">
-        <div class='tab-section'>
-            <div class='tab-desc'>
-                <div class='icon icon-approve' v-if="message.type == messageType.MARK"></div>
-                <div class='icon icon-mess' v-if="message.type == messageType.COMMENT"></div>
-                <div class='icon icon-upload' v-if="message.type == messageType.CONTENT"></div>
-                <p v-if="message.type != messageType.SYSTEM">{{message.text}}</p>
-            </div>
-            <div  v-if="message.type != messageType.SYSTEM" class='activity-time'>{{ formatDate(message.createdAt) }}</div>
-        </div>
-        <div class='mess-body' v-if="message.type == messageType.SYSTEM">{{message.text}}</div>
-        <div class='upload-files' v-if="message.type == messageType.CONTENT && message.images.length">
-            <div class="img-wrap" v-for="(img, index) in message.images" :key="index" @click="$emit('selectedImg', index)">
-                <img :src="img">
-            </div>
-        </div>
-    </div>
-  </div>
+<template lang="pug">
+.tab-item.active-item
+  .tab-title Today
+  .wrap-helper(v-for='message in messages' :key='message.id')
+    .tab-section
+      .tab-desc
+        .icon.icon-approve(v-if='message.type == messageType.MARK')
+        .icon.icon-mess(v-if='message.type == messageType.COMMENT')
+        .icon.icon-upload(v-if='message.type == messageType.CONTENT')
+        p(v-if='message.type != messageType.SYSTEM') {{ message.text }}
+      .activity-time(v-if='message.type != messageType.SYSTEM') {{ formatDate(message.createdAt) }}
+    .mess-body(v-if='message.type == messageType.SYSTEM') {{ message.text }}
+    .upload-files(v-if='message.type == messageType.CONTENT && message.images.length')
+      .img-wrap(v-for='(img, index) in message.images' :key='index' @click="$emit('selectedImg', index)")
+        img(:src='img')
 </template>
 
-<script lang='ts'>
-import formatDate from '@/mixins/formatDate'
-import MessageType from '@/core/enums/message-type.enum'
+<script lang="ts">
+import formatDate from '@/mixins/formatDate';
+import MessageType from '@/core/enums/message-type.enum';
+import {MessageInterface} from '@/types/message.interface';
 
 export default formatDate.extend({
   name: 'Activity',
   mixins: [formatDate],
-  data () {
+  data() {
     return {
       messageType: MessageType,
       messages: [
@@ -37,35 +32,38 @@ export default formatDate.extend({
           text: 'Darika Samak mark as done Listing on Product Hunt so that we can reach as many potential users',
           createdAt: '2021-10-27T21:39:54.159Z',
           images: [],
-          id: 1
+          id: 1,
         },
         {
           type: 'comment',
           text: 'Emilee Simchenko commented on Account for teams and personal in bottom style',
           createdAt: '2021-10-27T21:39:54.159Z',
           images: [],
-          id: 2
+          id: 2,
         },
         {
           type: 'system',
           text: 'During a project build, it is necessary to evaluate the product design and development against project requirements and outcomes',
           createdAt: '2021-10-27T21:39:54.159Z',
           images: [],
-          id: 3
+          id: 3,
         },
         {
           type: 'content',
           text: 'Emilee Simchenko commented on Account for teams and personal in bottom style',
           createdAt: '2021-10-27T21:39:54.159Z',
-          images: ['https://i.pinimg.com/originals/97/89/b0/9789b0dba1b81f2b6ae96cf1d0067f0a.jpg', 'https://cdn.jpegmini.com/user/images/slider_puffin_before_mobile.jpg'],
-          id: 4
-        }
-      ]
-    }
-  }
-})
+          images: [
+            'https://i.pinimg.com/originals/97/89/b0/9789b0dba1b81f2b6ae96cf1d0067f0a.jpg',
+            'https://cdn.jpegmini.com/user/images/slider_puffin_before_mobile.jpg',
+          ],
+          id: 4,
+        },
+      ] as MessageInterface[],
+    };
+  },
+});
 </script>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 @import '../scss/vars';
 .tab-content {
   padding: 35px 30px 90px;
