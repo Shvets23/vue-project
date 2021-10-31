@@ -1,26 +1,21 @@
-<template>
-  <div class='container'>
-    <AsideBar :notification="notificationsCount"/>
-    <!-- /#aside -->
-    <div class='main-block'>
-      <Header/>
-      <main>
-        <div class='tab-content'>
-          <router-view @selectedImg="notificationsCount = $event"/>
-        </div>
-      </main>
-    </div>
-    <!-- /.main-block -->
-  </div>
+<template lang="pug">
+.container
+  AsideBar(:notification='notificationsCount')
+    // /#aside
+  .main-block
+    Header
+    main
+      .tab-content
+        router-view(@selectedImg='notificationsCount = $event')
+  // /.main-block
 </template>
-
-<script lang='ts'>
-import Header from '@/components/Header.vue'
-import AsideBar from '@/components/AsideBar.vue'
-import formatDate from '@/mixins/formatDate'
-import MessageType from '@/core/enums/message-type.enum'
-import Tasks from '@/components/Tasks.vue'
-import Activity from '@/components/Activity.vue'
+<script lang="ts">
+import Header from '@/components/Header.vue';
+import AsideBar from '@/components/AsideBar.vue';
+import formatDate from '@/mixins/formatDate';
+import MessageType from '@/core/enums/message-type.enum';
+import Tasks from '@/components/Tasks.vue';
+import Activity from '@/components/Activity.vue';
 
 export default formatDate.extend({
   name: 'Home',
@@ -29,47 +24,17 @@ export default formatDate.extend({
     Header,
     AsideBar,
     Tasks,
-    Activity
+    Activity,
   },
-  data () {
+  data() {
     return {
       messageType: MessageType,
       notificationsCount: 2,
-      messages: [
-        {
-          type: 'mark',
-          text: 'Darika Samak mark as done Listing on Product Hunt so that we can reach as many potential users',
-          createdAt: '2021-10-27T21:39:54.159Z',
-          images: [],
-          id: 1
-        },
-        {
-          type: 'comment',
-          text: 'Emilee Simchenko commented on Account for teams and personal in bottom style',
-          createdAt: '2021-10-27T21:39:54.159Z',
-          images: [],
-          id: 2
-        },
-        {
-          type: 'system',
-          text: 'During a project build, it is necessary to evaluate the product design and development against project requirements and outcomes',
-          createdAt: '2021-10-27T21:39:54.159Z',
-          images: [],
-          id: 3
-        },
-        {
-          type: 'content',
-          text: 'Emilee Simchenko commented on Account for teams and personal in bottom style',
-          createdAt: '2021-10-27T21:39:54.159Z',
-          images: ['https://i.pinimg.com/originals/97/89/b0/9789b0dba1b81f2b6ae96cf1d0067f0a.jpg', 'https://cdn.jpegmini.com/user/images/slider_puffin_before_mobile.jpg'],
-          id: 4
-        }
-      ]
-    }
-  }
-})
+    };
+  },
+});
 </script>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 @import '../scss/vars';
 .tab-content {
   padding: 35px 30px 90px;
