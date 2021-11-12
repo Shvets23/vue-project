@@ -1,6 +1,6 @@
 <template lang="pug">
 .container
-  AsideBar(:notification='notificationsCount')
+  aside-bar(:notification='notificationsCount')
     // /#aside
   .main-block
     Header
@@ -14,8 +14,6 @@ import Header from '@/components/Header.vue';
 import AsideBar from '@/components/AsideBar.vue';
 import formatDate from '@/mixins/formatDate';
 import MessageType from '@/core/enums/message-type.enum';
-import Tasks from '@/components/Tasks.vue';
-import Activity from '@/components/Activity.vue';
 
 export default formatDate.extend({
   name: 'Home',
@@ -23,8 +21,6 @@ export default formatDate.extend({
   components: {
     Header,
     AsideBar,
-    Tasks,
-    Activity,
   },
   data() {
     return {

@@ -10,8 +10,7 @@ header
       .users-section
         ul
           li(v-for='user in users' :key='user.id')
-            a(href='#')
-              img(:src='user.avatar' alt='user-avatar')
+            user-avatar(:user='user')
       .social-btns
         button.btn.btn-share Share
         button.btn.btn-chat Chat
@@ -23,6 +22,7 @@ header
 <script lang="ts">
 import Vue from 'vue';
 import {UserInterface} from '@/types/user.interface';
+import UserAvatar from '@/components/UserAvatar.vue';
 
 export default Vue.extend({
   name: 'Header',
@@ -62,28 +62,27 @@ export default Vue.extend({
           userName: 'Test User',
           openedTasks: 0,
           completedTasks: 1,
-          avatar:
-            'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Z2lybCUyMGZhY2V8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80',
+          avatar: 'girl2.jpeg',
         },
         {
           id: 2,
           userName: 'Test User',
           openedTasks: 0,
           completedTasks: 1,
-          avatar: 'https://yt3.ggpht.com/ytc/AKedOLT0A44VRLrEQcf1Usr0VxdSS2kHaG0PCsiPuWZdRA=s900-c-k-c0x00ffffff-no-rj',
+          avatar: 'girl3.jpg',
         },
         {
           id: 3,
           userName: 'Test User',
           openedTasks: 0,
           completedTasks: 1,
-          avatar:
-            'https://cdn.shopify.com/s/files/1/0045/5104/9304/t/27/assets/AC_ECOM_SITE_2020_REFRESH_1_INDEX_M2_THUMBS-V2-1.jpg?v=8913815134086573859',
+          avatar: 'man.jpg',
         },
       ] as UserInterface[],
       activeTab: 3,
     };
   },
+  components: {UserAvatar},
   methods: {
     onTabChange(url: string) {
       this.currentUrl = url;
@@ -158,9 +157,6 @@ header {
           display: inline-block;
           overflow: hidden;
           cursor: pointer;
-          img {
-            width: 100%;
-          }
         }
         li + li {
           margin-left: 5px;
