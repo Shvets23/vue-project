@@ -1,16 +1,19 @@
 <template lang="pug">
 .tab-item.active-item
   .tab-title Files
+  coming-soon
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import ComingSoon from '@/components/ComingSoon.vue';
 
 export default Vue.extend({
   name: 'Files',
   props: {
     msg: String,
   },
+  components: {ComingSoon},
 });
 </script>
 

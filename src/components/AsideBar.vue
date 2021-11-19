@@ -44,13 +44,16 @@ export default Vue.extend({
   },
   methods: {
     completeTask() {
-      this.currentUser.openedTasks ? this.changeTasksCount() : alert('Sorry, you have no open tasks.');
+      this.currentUser.openedTasks ? this.navigateToTask() : alert('Sorry, you have no open tasks.');
     },
     changeTasksCount() {
       if (confirm(this.confirmText)) {
         this.currentUser.completedTasks++;
         this.currentUser.openedTasks--;
       }
+    },
+    navigateToTask() {
+      this.$router.push({path: '/tasks'});
     },
   },
   data() {

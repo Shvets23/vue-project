@@ -1,16 +1,19 @@
 <template lang="pug">
 .tab-item.active-item
   .tab-title Calendar
+  coming-soon
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import ComingSoon from '@/components/ComingSoon.vue';
 
 export default Vue.extend({
   name: 'Calendar',
   props: {
     msg: String,
   },
+  components: {ComingSoon},
 });
 </script>
 

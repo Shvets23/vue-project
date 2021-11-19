@@ -181,10 +181,12 @@ header {
         display: block;
       }
       .active-tab {
-        border-bottom: 2px solid $yellow;
         a {
           opacity: 1;
         }
+      }
+      .router-link-active {
+        border-bottom: 2px solid $yellow;
       }
     }
   }
