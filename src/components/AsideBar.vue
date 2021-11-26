@@ -1,5 +1,5 @@
 <template lang="pug">
-aside
+aside(id='aside', :class="{ 'open-aside': isAsideOpen }" )
   .aside-header-wrap
     .logo
       img(src='../assets/img/Logo@3x.svg' alt='logo')
@@ -8,7 +8,7 @@ aside
       input#search(type='text')
       .search-icon
   .btn-menu
-    img(src='../assets/img/menu.svg')
+    img(src='../assets/img/menu.svg', @click='isAsideOpen = !isAsideOpen')
   user(:user='currentUser')
   .aside-main-wrap
     .task-wrap
@@ -58,6 +58,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      isAsideOpen: false,
       confirmText: 'Are you sure you want to change the number of tasks?',
       currentUser: {
         userName: 'Jean Gonzales',
