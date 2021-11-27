@@ -6,11 +6,24 @@
       th Title
       th Description
       th Date
-    tr(v-for='task in tasks' :key='task.id')
+      th
+    tr(v-for='(task, index) in tasks' :key='index')
       td.task-title {{ task.title }}
       td {{ task.description }}
       td.task-date {{ formatDate(task.dateTo) }}
+      td
+        img(src='../assets/img/delete.svg', @click='deleteTask(index)')
 
+  .form-container
+    h1 Add new task
+    form(@submit.prevent="addTask()", ref="anyName")
+      .form-field
+        label Title
+        input(required, v-model='form.title' )
+      .form-field
+        label Description
+        textarea(required, v-model='form.description' )
+      button.btn(type="submit") Add task
 </template>
 
 <script lang="ts">
@@ -21,6 +34,12 @@ export default formatDate.extend({
   name: 'Tasks',
   data() {
     return {
+      form: {
+        title: '',
+        description: '',
+        id: 1,
+        dateTo: new Date().toISOString(),
+      },
       tasks: [
         {
           id: 1,
@@ -44,6 +63,18 @@ export default formatDate.extend({
       ] as TaskInterface[],
     };
   },
+  methods: {
+    addTask() {
+      this.form.id = this.tasks.length + 1;
+      const task = {...this.form};
+      this.tasks.push(task);
+      this.form.title = '';
+      this.form.description = '';
+    },
+    deleteTask(i: number) {
+      this.tasks.splice(i, 1);
+    },
+  },
 });
 </script>
 
@@ -65,6 +96,35 @@ table {
   }
   .task-date {
     min-width: 100px;
+  }
+}
+
+.form-container {
+  width: 300px;
+  margin: 0 auto;
+  margin-top: 20px;
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+
+    input,
+    textarea {
+      width: 100%;
+      border-radius: 8px;
+      padding: 10px;
+      border: 1px solid lightgray;
+    }
+
+    label {
+      margin: 10px 0;
+    }
+  }
+
+  .btn {
+    margin-top: 20px;
   }
 }
 </style>
