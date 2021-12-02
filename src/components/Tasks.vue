@@ -3,7 +3,7 @@
   .tab-title Tasks
   .form-container
     h1 Add new task
-    form(@submit.prevent="addTask()", :ref="setItemRef")
+    form(@submit.prevent="addTask()")
       .form-field
         label Title
         input(required, v-model='form.title' )
@@ -11,13 +11,13 @@
         label Description
         textarea(required, v-model='form.description' )
       button.btn(type="submit") Add task
-  table
+  table(v-if='tasks.length')
     tr
       th Title
       th Description
       th Date
       th
-    tr(v-for='(task, index) in tasks' :key="`task-${index}`" :ref="setItemRef")
+    tr(v-for='(task, index) in tasks' :key="`task-${index}`" ref="tableRow")
       td.task-title {{ task.title }}
       td {{ task.description }}
       td.task-date {{ formatDate(task.dateTo) }}
@@ -25,49 +25,31 @@
         img(src='../assets/img/delete.svg', @click='deleteTask(index)')
 </template>
 
-<script lang="ts">
+<script>
 import formatDate from '@/mixins/formatDate';
 import {TaskInterface} from '@/types/task.interface';
 
 export default formatDate.extend({
   name: 'Tasks',
-  mounted() {
-    this.itemRefs.forEach((el) => {
-      console.log(90);
-    });
-    // this.tasks.forEach((el, i) => {
-    //   setTimeout(() => {
-    //     this.$refs.tableRow[i].classList.value = 'animated';
-    //   }, i * 500);
-    // });
-    // increase - text;
-  },
   data() {
     return {
-      itemRefs: [],
       form: {
         title: '',
         description: '',
         dateTo: new Date().toISOString(),
       },
-      tasks: [] as TaskInterface[],
+      tasks: [],
       taskCounter: 0,
     };
   },
   methods: {
-    setItemRef(el: any) {
-      console.log(el, 'el');
-      if (el) {
-        this.itemRefs.push(el);
-      }
-    },
     addTask() {
       const task = {...this.form};
       this.tasks.push(task);
       this.form.title = '';
       this.form.description = '';
     },
-    deleteTask(i: number) {
+    deleteTask(i) {
       this.tasks.splice(i, 1);
       this.taskCounter = this.tasks.length;
     },
@@ -93,17 +75,18 @@ export default formatDate.extend({
     ];
     this.taskCounter = this.tasks.length;
   },
-  // updated() {
-  //   // if (this.taskCounter < this.tasks.length) {
-  //   //   this.taskCounter++;
-  //   //   this.$refs.tableRow[this.$refs.tableRow.length - 1].classList.value = 'new-task';
-  //   // }
-  // },
-  beforeUpdate() {
-    this.itemRefs = [];
+  mounted() {
+    this.tasks.forEach((el, i) => {
+      setTimeout(() => {
+        this.$refs.tableRow[i].classList.value = 'animated';
+      }, i * 500);
+    });
   },
   updated() {
-    console.log(this.itemRefs);
+    if (this.taskCounter < this.tasks.length) {
+      this.taskCounter++;
+      this.$refs.tableRow[this.$refs.tableRow.length - 1].classList.value = 'new-task';
+    }
   },
 });
 </script>
