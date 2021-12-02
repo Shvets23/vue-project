@@ -38,7 +38,9 @@ import User from '@/components/User.vue';
 
 export default Vue.extend({
   name: 'AsideBar',
-  props: ['notification'],
+  props: {
+    notification: Number,
+  },
   components: {
     User,
   },
