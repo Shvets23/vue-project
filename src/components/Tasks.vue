@@ -25,7 +25,7 @@
         img(src='../assets/img/delete.svg', @click='deleteTask(index)')
 </template>
 
-<script>
+<script lang="ts">
 import formatDate from '@/mixins/formatDate';
 import {TaskInterface} from '@/types/task.interface';
 
@@ -38,7 +38,7 @@ export default formatDate.extend({
         description: '',
         dateTo: new Date().toISOString(),
       },
-      tasks: [],
+      tasks: [] as TaskInterface[],
       taskCounter: 0,
     };
   },
@@ -49,7 +49,7 @@ export default formatDate.extend({
       this.form.title = '';
       this.form.description = '';
     },
-    deleteTask(i) {
+    deleteTask(i: number) {
       this.tasks.splice(i, 1);
       this.taskCounter = this.tasks.length;
     },
@@ -76,16 +76,16 @@ export default formatDate.extend({
     this.taskCounter = this.tasks.length;
   },
   mounted() {
-    this.tasks.forEach((el, i) => {
+    this.tasks.forEach((el: TaskInterface, i: number) => {
       setTimeout(() => {
-        this.$refs.tableRow[i].classList.value = 'animated';
+        (this as any).$refs.tableRow[i].classList.value = 'animated';
       }, i * 500);
     });
   },
   updated() {
     if (this.taskCounter < this.tasks.length) {
       this.taskCounter++;
-      this.$refs.tableRow[this.$refs.tableRow.length - 1].classList.value = 'new-task';
+      (this as any).$refs.tableRow[(this as any).$refs.tableRow.length - 1].classList.value = 'new-task';
     }
   },
 });
