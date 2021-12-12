@@ -1,7 +1,7 @@
 <template lang="pug">
 .tab-item.active-item
   .tab-title Today
-  .wrap-helper(v-for='message in messages' :key='message.id')
+  .wrap-helper(v-for='message in messages' :key="`message-${message.id}`")
     .tab-section
       .tab-desc
         .icon.icon-approve(v-if='message.type == messageType.MARK')
@@ -11,7 +11,7 @@
       .activity-time(v-if='message.type != messageType.SYSTEM') {{ formatDate(message.createdAt) }}
     .mess-body(v-if='message.type == messageType.SYSTEM') {{ message.text }}
     .upload-files(v-if='message.type == messageType.CONTENT && message.images.length')
-      .img-wrap(v-for='(img, index) in message.images' :key='index' @click="$emit('selectedImg', index)")
+      .img-wrap(v-for='(img, index) in message.images' :key="`image-${index}`" @click="$emit('selectedImg', index)")
         img(:src='img')
 </template>
 

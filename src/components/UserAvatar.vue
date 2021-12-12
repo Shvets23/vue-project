@@ -8,7 +8,9 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'UserAvatar',
-  props: ['user'],
+  props: {
+    user: Object,
+  },
   methods: {
     getImgUrl(img: string) {
       return require('../assets/img/' + img);

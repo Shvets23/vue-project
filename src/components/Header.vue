@@ -9,14 +9,14 @@ header
     .social-wrap
       .users-section
         ul
-          li(v-for='user in users' :key='user.id')
+          li(v-for='user in users' :key="`user-${user.id}`")
             user-avatar(:user='user')
       .social-btns
         button.btn.btn-share Share
         button.btn.btn-chat Chat
   .tabs-section
     ul
-      li.tab-link(v-for='tab in tabsList' :key='tab.id' @click='onTabChange(tab.url)' :class="{ 'active-tab': currentUrl === tab.url }")
+      li.tab-link(v-for='tab in tabsList' :key="`tab-${tab.id}`" @click='onTabChange(tab.url)' :class="{ 'active-tab': currentUrl === tab.url }")
         router-link(:to='tab.url') {{tab.name}}
 </template>
 <script lang="ts">
