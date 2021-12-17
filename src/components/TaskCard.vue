@@ -1,26 +1,46 @@
 <template lang="pug">
   .card-wrapper
-    .task-badge
-      span(v-if='task.status === taskStatus.TO_DO') To Do
-      span(v-if='task.status === taskStatus.IN_PROGRESS') In Progress
-      span(v-if='task.status === taskStatus.DONE') Done
-    .task-title {{task.title}}
-    .task-date {{formatDate(task.dateTo)}}
+    .task-wrapper(@click='openModal()')
+      .task-badge
+        span(v-if='task.status === taskStatus.TO_DO') To Do
+        span(v-if='task.status === taskStatus.IN_PROGRESS') In Progress
+        span(v-if='task.status === taskStatus.DONE') Done
+      .task-title {{task.title}}
+      .task-date {{formatDate(task.dateTo)}}
+    task-modal(v-if="isOpenModal" @close="close()" @onTaskChanged='updateTask($event)' :task='task')
 </template>
 
 <script lang="ts">
 import TaskStatus from '@/core/enums/task-status.enum';
 import formatDate from '@/mixins/formatDate';
+import TaskModal from '@/modals/TaskModal.vue';
 
 export default formatDate.extend({
   name: 'TaskCard',
   data() {
     return {
       taskStatus: TaskStatus,
+      isOpenModal: false,
     };
   },
   props: {
     task: Object,
+    index: Number,
+  },
+  components: {
+    TaskModal,
+  },
+  methods: {
+    close() {
+      this.isOpenModal = false;
+    },
+    openModal() {
+      this.isOpenModal = true;
+    },
+    updateTask(data: any) {
+      this.$emit('onTaskChanged', data);
+      this.isOpenModal = false;
+    },
   },
 });
 </script>
@@ -32,8 +52,10 @@ export default formatDate.extend({
   position: relative;
   min-width: 200px;
   margin-bottom: 15px;
+  background: white;
   .task-title {
     font-weight: 700;
+    text-align: left;
   }
   .task-date {
     text-align: right;

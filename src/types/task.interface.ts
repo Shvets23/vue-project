@@ -3,4 +3,5 @@ export interface TaskInterface {
   description: string;
   dateTo: string;
   status: number;
+  id: number;
 }

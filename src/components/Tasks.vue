@@ -2,15 +2,7 @@
   .tab-item.active-item
     .tab-title Tasks
     .form-container
-      h1 Add new task
-      form(@submit.prevent="addTask()")
-        .form-field
-          label Title
-          input(required, v-model='form.title' )
-        .form-field
-          label Description
-          textarea(required, v-model='form.description' )
-        button.btn(type="submit") Add task
+      h1(@click='isOpenModal = true') Add new task
     table(v-if='tasks.length')
       tr
         th Title
@@ -23,31 +15,30 @@
         td.task-date {{ formatDate(task.dateTo) }}
         td
           img(src='../assets/img/delete.svg', @click='deleteTask(index)')
+    task-modal(v-if="isOpenModal" @close="isOpenModal = false" @onTaskChanged='addTask($event)')
 </template>
 
 <script lang="ts">
 import formatDate from '@/mixins/formatDate';
 import {TaskInterface} from '@/types/task.interface';
+import TaskModal from '@/modals/TaskModal.vue';
+
 export default formatDate.extend({
   name: 'Tasks',
   data() {
     return {
-      form: {
-        title: '',
-        description: '',
-        dateTo: new Date().toISOString(),
-        status: 0,
-      },
+      isOpenModal: false,
       tasks: [] as TaskInterface[],
       taskCounter: 0,
     };
   },
+  components: {TaskModal},
   methods: {
-    addTask() {
-      const task = {...this.form};
-      this.tasks.push(task);
-      this.form.title = '';
-      this.form.description = '';
+    addTask(data: any) {
+      const newTask = data;
+      newTask.id = Math.floor(Math.random() * 1000);
+      this.tasks.push(newTask);
+      this.isOpenModal = false;
     },
     deleteTask(i: number) {
       this.tasks.splice(i, 1);
@@ -61,12 +52,14 @@ export default formatDate.extend({
         description: 'All references should open in a new tab in browser. To view the reference, click on the eye',
         dateTo: '2021-10-27T21:39:54.159Z',
         status: 0,
+        id: 1,
       },
       {
         title: 'Add Video',
         description: 'All references should open in a new tab in browser. To view the reference, click on the eye',
         dateTo: '2021-11-14T21:39:54.159Z',
         status: 0,
+        id: 2,
       },
       {
         title: 'Shared session',
@@ -74,12 +67,14 @@ export default formatDate.extend({
           'This is the tab that relates to whether the session is shared (this is a sorting option for sessions',
         dateTo: '2021-08-23T21:39:54.159Z',
         status: 1,
+        id: 3,
       },
       {
         title: 'Wait for start',
         description: 'When the session has NOT been started yet, the user wont be allowed entering the system',
         dateTo: '2021-05-07T21:39:54.159Z',
         status: 2,
+        id: 4,
       },
     ];
     this.taskCounter = this.tasks.length;
@@ -127,29 +122,15 @@ table {
   }
 }
 .form-container {
-  width: 300px;
-  margin: 0 auto;
-  margin-top: 20px;
-  .form-field {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: 10px;
-    input,
-    textarea {
-      width: 100%;
-      border-radius: 8px;
-      padding: 10px;
-      border: 1px solid lightgray;
+  h1 {
+    transition: 0.2s;
+    cursor: pointer;
+    &:hover {
+      transform: scale(1.1);
     }
-    label {
-      margin: 10px 0;
-    }
-  }
-  .btn {
-    margin-top: 20px;
   }
 }
+
 @keyframes textTransform {
   0% {
     transform: scale(1);

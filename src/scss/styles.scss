@@ -1,5 +1,6 @@
 @import "./vars";
 @import "./reset";
+@import "./forms";
 
 body{
     font-family: Helvetica, sans-serif;
@@ -20,6 +21,7 @@ body{
     border: none;
     height: 30px;
     cursor: pointer;
+    width: 100px;
 }
 .btn-chat{
     background: #FFF8DD;
@@ -33,6 +35,10 @@ body{
     background: $lg;
     color: $dark;
     margin-right: 10px;
+}
+.btn-primary {
+    background: #0072ff;
+    color: white;
 }
 main{
     display: flex;

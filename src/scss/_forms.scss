@@ -1,0 +1,24 @@
+.form-container {
+  width: 300px;
+  margin: 0 auto;
+  margin-top: 20px;
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+    input,
+    textarea {
+      width: 100%;
+      border-radius: 8px;
+      padding: 10px;
+      border: 1px solid lightgray;
+    }
+    label {
+      margin: 10px 0;
+    }
+  }
+  .btn {
+    margin-top: 20px;
+  }
+}
