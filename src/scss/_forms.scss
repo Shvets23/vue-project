@@ -17,8 +17,15 @@
     label {
       margin: 10px 0;
     }
+    input + input {
+      margin-left: 10px;
+    }
   }
   .btn {
     margin-top: 20px;
+  }
+
+  input[type="date"] {
+    padding: 7px 10px;
   }
 }

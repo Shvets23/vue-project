@@ -22,6 +22,7 @@
 import formatDate from '@/mixins/formatDate';
 import {TaskInterface} from '@/types/task.interface';
 import TaskModal from '@/modals/TaskModal.vue';
+import TaskStatus from '@/core/enums/task-status.enum';
 
 export default formatDate.extend({
   name: 'Tasks',
@@ -34,7 +35,7 @@ export default formatDate.extend({
   },
   components: {TaskModal},
   methods: {
-    addTask(data: any) {
+    addTask(data: TaskInterface) {
       const newTask = data;
       newTask.id = Math.floor(Math.random() * 1000);
       this.tasks.push(newTask);
@@ -51,14 +52,14 @@ export default formatDate.extend({
         title: 'Add Reference',
         description: 'All references should open in a new tab in browser. To view the reference, click on the eye',
         dateTo: '2021-10-27T21:39:54.159Z',
-        status: 0,
+        status: TaskStatus.TO_DO,
         id: 1,
       },
       {
         title: 'Add Video',
         description: 'All references should open in a new tab in browser. To view the reference, click on the eye',
         dateTo: '2021-11-14T21:39:54.159Z',
-        status: 0,
+        status: TaskStatus.TO_DO,
         id: 2,
       },
       {
@@ -133,13 +134,13 @@ table {
 
 @keyframes textTransform {
   0% {
-    transform: scale(1);
+    font-size: 16px;
   }
   50% {
-    transform: scale(1.08);
+    font-size: 18px;
   }
   100% {
-    transform: scale(1);
+    font-size: 16px;
   }
 }
 @keyframes backgroundColor {
