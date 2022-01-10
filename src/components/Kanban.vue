@@ -37,6 +37,7 @@ import TaskStatus from '@/core/enums/task-status.enum';
 import TaskCard from '@/components/TaskCard.vue';
 import {TaskInterface} from '@/types/task.interface';
 import draggable from 'vuedraggable';
+import moment from 'moment';
 
 export default Vue.extend({
   name: 'Kanban',
@@ -68,7 +69,7 @@ export default Vue.extend({
       {
         title: 'Add Reference',
         description: 'All references should open in a new tab in browser. To view the reference, click on the eye',
-        dateTo: '2022-01-08T18:51:33.659Z',
+        dateTo: '2022-01-10T18:51:33.659Z',
         status: TaskStatus.TO_DO,
         id: 1,
       },
@@ -115,7 +116,7 @@ export default Vue.extend({
     searchKey() {
       this.filterTasks();
     },
-    dateFom() {
+    dateFrom() {
       this.filterTasks();
     },
     dateTo() {
@@ -163,9 +164,11 @@ export default Vue.extend({
     filterTasks(): void {
       this.filteredTasks = this.tasks.filter((task) => task.title.match(new RegExp(this.searchKey, 'i')));
       const temporaryTasks = [...this.filteredTasks];
-      if (!this.dateTo || !this.dateFrom) return;
+      if (!(this.dateTo && this.dateFrom)) return;
       this.filteredTasks = temporaryTasks.filter((task) => {
-        return new Date(task.dateTo) >= new Date(this.dateFrom) && new Date(task.dateTo) <= new Date(this.dateTo);
+        const taskDateMoment = moment(task.dateTo);
+        return;
+        taskDateMoment.isSameOrAfter(this.dateFrom, 'days') && taskDateMoment.isSameOrBefore(this.dateTo, 'days');
       });
     },
     clearFilters() {

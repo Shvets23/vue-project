@@ -37,7 +37,8 @@ export default Vue.extend({
         bg_blue: this.task.status === TaskStatus.IN_PROGRESS,
         bg_green: this.task.status === TaskStatus.DONE,
         expire:
-          Math.abs(new Date(this.task.dateTo).getTime() - new Date().getTime()) / 3600000 < 24 &&
+          moment(this.task.dateTo).diff(moment(), 'hours') < 24 &&
+          moment(this.task.dateTo).diff(moment(), 'hours') > 0 &&
           this.task.status != TaskStatus.DONE,
       };
     },
