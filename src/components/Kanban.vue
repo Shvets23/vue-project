@@ -167,8 +167,9 @@ export default Vue.extend({
       if (!(this.dateTo && this.dateFrom)) return;
       this.filteredTasks = temporaryTasks.filter((task) => {
         const taskDateMoment = moment(task.dateTo);
-        return;
-        taskDateMoment.isSameOrAfter(this.dateFrom, 'days') && taskDateMoment.isSameOrBefore(this.dateTo, 'days');
+        return (
+          taskDateMoment.isSameOrAfter(this.dateFrom, 'days') && taskDateMoment.isSameOrBefore(this.dateTo, 'days')
+        );
       });
     },
     clearFilters() {
