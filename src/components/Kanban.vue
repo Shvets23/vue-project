@@ -7,23 +7,23 @@
     .form-field.direction-row
       input(type="text" onfocus="(this.type='date')" v-model='dateFrom' placeholder="Date from" onfocusout="(this.type='text')")
       input(type="text" onfocus="(this.type='date')" v-model='dateTo' placeholder="Date To" onfocusout="(this.type='text')")
-  .clear_filters(@click='clearFilters()' v-if='dateTo || dateTo || searchKey' ) Clear all filters
+  .clear_filters(@click='clearFilters()' v-if='dateTo || dateFrom || searchKey' ) Clear all filters
   .mobile-tabs
-    .tab-item(:class="{active: activeTab === 'toDo'}" @click='activeTab = "toDo"') To do
-    .tab-item(:class="{active: activeTab === 'inProgress'}" @click='activeTab = "inProgress"') In Progress
-    .tab-item(:class="{active: activeTab === 'done'}" @click='activeTab = "done"') Done
+    .tab-item(:class="{active: isActiveToDo}" @click='changeActiveTab(taskStatus.TO_DO)') To do
+    .tab-item(:class="{active: isActiveInProgress}" @click='changeActiveTab(taskStatus.IN_PROGRESS)') In Progress
+    .tab-item(:class="{active: isActiveDone}" @click='changeActiveTab(taskStatus.DONE)') Done
   .container
-    .tasks-column.to-do(:class="{active: activeTab === 'toDo'}")
+    .tasks-column.to-do(:class="{active: isActiveToDo}")
       .tasks-column__title To Do
         |  ({{countToDo}})
       draggable.kanban-column(:list='tasksToDo' group='tasks' @change='taskToDoChange')
         task-card(v-for='(task, index) in tasksToDo' :key='index' :task='task' @onTaskChanged='updateTask($event, "tasksToDo")')
-    .tasks-column.in-progress(:class="{active: activeTab === 'inProgress'}")
+    .tasks-column.in-progress(:class="{active: isActiveInProgress}")
       .tasks-column__title In Progress
         |  ({{countInProgress}})
       draggable.kanban-column(:list='tasksInProgress' group='tasks' @change='taskInProgressChange')
         task-card(v-for='(task, index) in tasksInProgress' :key='index' :task='task'  @onTaskChanged='updateTask($event, "tasksInProgress")')
-    .tasks-column.done(:class="{active: activeTab === 'done'}" @click='activeTab = "done"')
+    .tasks-column.done(:class="{active: isActiveDone}")
       .tasks-column__title Done
         |  ({{countDone}})
       draggable.kanban-column(:list='tasksDone' group='tasks' @change='taskDoneChange')
@@ -38,6 +38,7 @@ import TaskCard from '@/components/TaskCard.vue';
 import {TaskInterface} from '@/types/task.interface';
 import draggable from 'vuedraggable';
 import moment from 'moment';
+import {mapGetters, mapState} from 'vuex';
 
 export default Vue.extend({
   name: 'Kanban',
@@ -54,7 +55,7 @@ export default Vue.extend({
       filteredTasks: [] as TaskInterface[],
       dateTo: '',
       dateFrom: '',
-      activeTab: 'toDo',
+      activeTab: 0,
     };
   },
   components: {
@@ -64,46 +65,8 @@ export default Vue.extend({
   props: {
     msg: String,
   },
-  created() {
-    this.tasks = [
-      {
-        title: 'Add Reference',
-        description: 'All references should open in a new tab in browser. To view the reference, click on the eye',
-        dateTo: '2022-01-10T18:51:33.659Z',
-        status: TaskStatus.TO_DO,
-        id: 1,
-      },
-      {
-        title: 'Add Video',
-        description: 'All references should open in a new tab in browser. To view the reference, click on the eye',
-        dateTo: '2021-11-14T21:39:54.159Z',
-        status: TaskStatus.TO_DO,
-        id: 2,
-      },
-      {
-        title: 'Shared session',
-        description:
-          'This is the tab that relates to whether the session is shared (this is a sorting option for sessions',
-        dateTo: '2021-08-23T21:39:54.159Z',
-        status: TaskStatus.IN_PROGRESS,
-        id: 3,
-      },
-      {
-        title: 'Private session',
-        description:
-          'This is the tab that relates to whether the session is shared (this is a sorting option for sessions)',
-        dateTo: new Date(this.today.getTime() + 23 * 60 * 60 * 1000).toISOString(),
-        status: TaskStatus.IN_PROGRESS,
-        id: 33,
-      },
-      {
-        title: 'Wait for start',
-        description: 'When the session has NOT been started yet, the user wont be allowed entering the system',
-        dateTo: '2021-05-07T21:39:54.159Z',
-        status: TaskStatus.DONE,
-        id: 4,
-      },
-    ];
+  created(): void {
+    this.tasks = this.getTasks;
     this.filteredTasks = [...this.tasks];
   },
   watch: {
@@ -124,6 +87,8 @@ export default Vue.extend({
     },
   },
   computed: {
+    ...mapGetters('tasks', ['getTasks']),
+
     countToDo(): number {
       return this.tasksToDo.length;
     },
@@ -132,6 +97,15 @@ export default Vue.extend({
     },
     countDone(): number {
       return this.tasksDone.length;
+    },
+    isActiveToDo(): boolean {
+      return this.activeTab === TaskStatus.TO_DO;
+    },
+    isActiveInProgress(): boolean {
+      return this.activeTab === TaskStatus.IN_PROGRESS;
+    },
+    isActiveDone(): boolean {
+      return this.activeTab === TaskStatus.DONE;
     },
   },
   methods: {
@@ -176,6 +150,9 @@ export default Vue.extend({
       this.searchKey = '';
       this.dateFrom = '';
       this.dateTo = '';
+    },
+    changeActiveTab(tabIndex: number): void {
+      this.activeTab = tabIndex;
     },
   },
 });
@@ -252,9 +229,11 @@ export default Vue.extend({
     .tab-item {
       width: 97px;
       padding: 10px 0;
+
       border-bottom: 2px solid transparent;
       transition: 0.5s;
       cursor: pointer;
+
       &.active,
       &:hover {
         background: #f3f0f0;

@@ -15,7 +15,7 @@
         td.task-date {{ formatDate(task.dateTo) }}
         td
           img(src='../assets/img/delete.svg', @click='deleteTask(index)')
-    task-modal(v-if="isOpenModal" @close="isOpenModal = false" @onTaskChanged='addTask($event)')
+    task-modal(v-if="isOpenModal" @close="isOpenModal = false" @onTaskChanged='addNewTask($event)')
 </template>
 
 <script lang="ts">
@@ -23,6 +23,7 @@ import formatDate from '@/mixins/formatDate';
 import {TaskInterface} from '@/types/task.interface';
 import TaskModal from '@/modals/TaskModal.vue';
 import TaskStatus from '@/core/enums/task-status.enum';
+import {mapGetters, mapMutations} from 'vuex';
 
 export default formatDate.extend({
   name: 'Tasks',
@@ -35,10 +36,11 @@ export default formatDate.extend({
   },
   components: {TaskModal},
   methods: {
-    addTask(data: TaskInterface) {
+    ...mapMutations('tasks', ['addTask']),
+    addNewTask(data: TaskInterface) {
       const newTask = data;
       newTask.id = Math.floor(Math.random() * 1000);
-      this.tasks.push(newTask);
+      this.addTask(newTask);
       this.isOpenModal = false;
     },
     deleteTask(i: number) {
@@ -47,38 +49,11 @@ export default formatDate.extend({
     },
   },
   created() {
-    this.tasks = [
-      {
-        title: 'Add Reference',
-        description: 'All references should open in a new tab in browser. To view the reference, click on the eye',
-        dateTo: '2021-10-27T21:39:54.159Z',
-        status: TaskStatus.TO_DO,
-        id: 1,
-      },
-      {
-        title: 'Add Video',
-        description: 'All references should open in a new tab in browser. To view the reference, click on the eye',
-        dateTo: '2021-11-14T21:39:54.159Z',
-        status: TaskStatus.TO_DO,
-        id: 2,
-      },
-      {
-        title: 'Shared session',
-        description:
-          'This is the tab that relates to whether the session is shared (this is a sorting option for sessions',
-        dateTo: '2021-08-23T21:39:54.159Z',
-        status: 1,
-        id: 3,
-      },
-      {
-        title: 'Wait for start',
-        description: 'When the session has NOT been started yet, the user wont be allowed entering the system',
-        dateTo: '2021-05-07T21:39:54.159Z',
-        status: 2,
-        id: 4,
-      },
-    ];
+    this.tasks = this.getTasks;
     this.taskCounter = this.tasks.length;
+  },
+  computed: {
+    ...mapGetters('tasks', ['getTasks']),
   },
   mounted() {
     this.tasks.forEach((el: TaskInterface, i: number) => {
