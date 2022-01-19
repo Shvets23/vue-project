@@ -9,7 +9,7 @@
       th Description
       th Date
       th
-    tr(v-for='(task, index) in tasks' :key="`task-${index}`" ref="tableRow")
+    tr(v-for='(task, i) in tasks' :key="`task-${index}`"  :ref="el => { if (el) divs[i] = el }")
       td.task-title {{ task.title }}
       td {{ task.description }}
       td.task-date {{formatDate(task.dateTo)}}
@@ -24,8 +24,21 @@ import TaskModal from '@/modals/TaskModal.vue';
 import {mapGetters, mapMutations} from 'vuex';
 import {defineComponent} from 'vue';
 import moment from 'moment';
+import {ref, reactive, onBeforeUpdate} from 'vue';
+import TaskStatus from '@/core/enums/task-status.enum';
 
 export default defineComponent({
+  setup() {
+    const list = reactive([1, 2, 3]);
+    const divs = ref([]);
+    onBeforeUpdate(() => {
+      divs.value = [];
+    });
+    return {
+      list,
+      divs,
+    };
+  },
   name: 'Tasks',
   data() {
     return {
@@ -39,6 +52,8 @@ export default defineComponent({
     ...mapMutations('tasks', ['addTask', 'removeTask']),
     addNewTask(data: TaskInterface) {
       const newTask = data;
+      newTask.dateTo = new Date().toISOString();
+      newTask.status = TaskStatus.TO_DO;
       newTask.id = Math.floor(Math.random() * 1000);
       this.addTask(newTask);
       this.isOpenModal = false;
@@ -58,16 +73,20 @@ export default defineComponent({
     ...mapGetters('tasks', ['getTasks']),
   },
   mounted() {
-    this.tasks.forEach((el: TaskInterface, i: number) => {
+    this.divs.forEach((el: Element, i: number) => {
       setTimeout(() => {
-        (this as any).$refs.tableRow[i].classList.value = 'animated';
+        el.classList.value = 'animated';
       }, i * 500);
     });
   },
   updated() {
     if (this.taskCounter < this.tasks.length) {
       this.taskCounter++;
-      (this as any).$refs.tableRow[(this as any).$refs.tableRow.length - 1].classList.value = 'new-task';
+      this.divs.find((el: Element, i: number) => {
+        if (i === this.divs.length - 1) {
+          el.classList.value = 'new-task';
+        }
+      });
     }
   },
 });

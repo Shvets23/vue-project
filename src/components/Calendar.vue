@@ -2,9 +2,6 @@
 .tab-item.active-item
   .tab-title Calendar
   .text-center.section
-    h2.h2 Custom Calendars
-    p.text-lg.font-medium.text-gray-600.mb-6
-      | Roll your own calendars using scoped slots
     v-calendar.custom-calendar.max-w-full(:masks='masks' :attributes='attributes' disable-page-swipe='' is-expanded='')
       template(v-slot:day-content='{ day, attributes }')
         .flex.flex-col.h-full.z-10.overflow-hidden
@@ -64,6 +61,9 @@ export default defineComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
+.tab-title {
+  margin-bottom: 30px;
+}
 ::-webkit-scrollbar {
   width: 0px;
 }
