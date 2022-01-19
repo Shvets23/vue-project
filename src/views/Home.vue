@@ -139,4 +139,16 @@ export default formatDate.extend({
     }
   }
 }
+@media only screen and (max-width: 580px) {
+  .tab-content {
+    width: 90%;
+    margin-left: 10px;
+    .tab-item {
+      .mess-body,
+      .upload-files {
+        margin: 20px 40px 0;
+      }
+    }
+  }
+}
 </style>

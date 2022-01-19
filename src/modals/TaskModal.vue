@@ -17,6 +17,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import TaskStatus from '@/core/enums/task-status.enum';
 
 export default Vue.extend({
   name: 'TaskModal',
@@ -28,7 +29,7 @@ export default Vue.extend({
           title: '',
           description: '',
           dateTo: new Date().toISOString(),
-          status: 0,
+          status: TaskStatus.TO_DO,
           id: null,
         };
       },
