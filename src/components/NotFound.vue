@@ -1,14 +1,14 @@
 <template lang="pug">
-  .wrap
-    p.main-content 404
-    p The page you were looking for doesn't exist. Return to
-      router-link(to='/tasks')  homepage.
+.wrap
+  p.main-content 404
+  p The page you were looking for doesn't exist. Return to
+    router-link(to='/tasks')  homepage.
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import {defineComponent} from 'vue';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'NotFound',
 });
 </script>

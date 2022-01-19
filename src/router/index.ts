@@ -1,9 +1,7 @@
-import Vue from 'vue';
-import VueRouter, {RouteConfig} from 'vue-router';
+import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router';
+import Home from '../views/Home.vue';
 
-Vue.use(VueRouter);
-
-const routes: Array<RouteConfig> = [
+const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     redirect: '/tasks',
@@ -32,15 +30,14 @@ const routes: Array<RouteConfig> = [
       },
     ],
   },
-  {
-    path: '*',
-    component: () => import('../components/NotFound.vue'),
-  },
+  // {
+  //   path: '*',
+  //   component: () => import('../components/NotFound.vue'),
+  // },
 ];
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 

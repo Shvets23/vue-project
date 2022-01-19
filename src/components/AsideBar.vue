@@ -32,11 +32,11 @@ aside(id='aside', :class="{ 'open-aside': isAsideOpen }" )
 
 </template>
 <script lang="ts">
-import Vue from 'vue';
+import {defineComponent} from 'vue';
 import {UserInterface} from '@/types/user.interface';
 import User from '@/components/User.vue';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'AsideBar',
   props: {
     notification: Number,

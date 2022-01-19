@@ -16,31 +16,34 @@
     .tasks-column.to-do(:class="{active: isActiveToDo}")
       .tasks-column__title To Do
         |  ({{countToDo}})
-      draggable.kanban-column(:list='tasksToDo' group='tasks' @change='taskToDoChange')
-        task-card(v-for='(task, index) in tasksToDo' :key='index' :task='task' @onTaskChanged='updateTask($event, "tasksToDo")')
+      draggable(v-model='tasksToDo' group='people' @start='drag=true' @end='drag=false' item-key='id' @change='taskToDoChange')
+        template(#item='{element}')
+          task-card(:task='element')
     .tasks-column.in-progress(:class="{active: isActiveInProgress}")
       .tasks-column__title In Progress
         |  ({{countInProgress}})
-      draggable.kanban-column(:list='tasksInProgress' group='tasks' @change='taskInProgressChange')
-        task-card(v-for='(task, index) in tasksInProgress' :key='index' :task='task'  @onTaskChanged='updateTask($event, "tasksInProgress")')
+      draggable(v-model='tasksInProgress' group='people' @start='drag=true' @end='drag=false' item-key='id' @change='taskInProgressChange')
+        template(#item='{element}')
+          task-card(:task='element' @onTaskChanged='onUpdateTask($event)')
     .tasks-column.done(:class="{active: isActiveDone}")
       .tasks-column__title Done
         |  ({{countDone}})
-      draggable.kanban-column(:list='tasksDone' group='tasks' @change='taskDoneChange')
-        task-card(v-for='(task, index) in tasksDone' :key='index' :task='task'  @onTaskChanged='updateTask($event, "tasksDone")')
+      draggable(v-model='tasksDone' group='people' @start='drag=true' @end='drag=false' item-key='id' @change='taskDoneChange')
+        template(#item='{element}')
+          task-card(:task='element')
 
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import {defineComponent} from 'vue';
 import TaskStatus from '@/core/enums/task-status.enum';
 import TaskCard from '@/components/TaskCard.vue';
 import {TaskInterface} from '@/types/task.interface';
 import draggable from 'vuedraggable';
 import moment from 'moment';
-import {mapGetters, mapState} from 'vuex';
+import {mapGetters, mapMutations, mapState} from 'vuex';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Kanban',
   data() {
     return {
@@ -109,31 +112,29 @@ export default Vue.extend({
     },
   },
   methods: {
+    ...mapMutations('tasks', ['updateTask']),
     separateTasks() {
       this.tasksToDo = this.filteredTasks.filter((el) => el.status === TaskStatus.TO_DO);
       this.tasksInProgress = this.filteredTasks.filter((el) => el.status === TaskStatus.IN_PROGRESS);
       this.tasksDone = this.filteredTasks.filter((el) => el.status === TaskStatus.DONE);
     },
     taskDoneChange(data: any) {
-      this.changeTaskStatus('tasksDone', data.added?.newIndex, TaskStatus.DONE);
+      let task = Object.assign({}, data.added?.element);
+      task.status = TaskStatus.DONE;
+      this.updateTask(task);
     },
     taskToDoChange(data: any) {
-      this.changeTaskStatus('tasksToDo', data.added?.newIndex, TaskStatus.TO_DO);
+      let task = Object.assign({}, data.added?.element);
+      task.status = TaskStatus.TO_DO;
+      this.updateTask(task);
     },
     taskInProgressChange(data: any) {
-      this.changeTaskStatus('tasksInProgress', data.added?.newIndex, TaskStatus.IN_PROGRESS);
+      let task = Object.assign({}, data.added?.element);
+      task.status = TaskStatus.IN_PROGRESS;
+      this.updateTask(task);
     },
-    changeTaskStatus(array: string, index: number, status: number) {
-      if (index) {
-        (this as any)[array][index]['status'] = status;
-      }
-    },
-    updateTask(task: TaskInterface, array: string) {
-      (this as any)[array].forEach((el: TaskInterface, i: number) => {
-        if (el.id === task.id) {
-          Vue.set((this as any)[array], i, task);
-        }
-      });
+    onUpdateTask(task: any) {
+      this.updateTask(task);
     },
     filterTasks(): void {
       this.filteredTasks = this.tasks.filter((task) => task.title.match(new RegExp(this.searchKey, 'i')));

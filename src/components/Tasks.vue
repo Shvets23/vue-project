@@ -1,31 +1,31 @@
 <template lang="pug">
-  .tab-item.active-item
-    .tab-title Tasks
-    .form-container
-      h1(@click='isOpenModal = true') Add new task
-    table(v-if='tasks.length')
-      tr
-        th Title
-        th Description
-        th Date
-        th
-      tr(v-for='(task, index) in tasks' :key="`task-${index}`" ref="tableRow")
-        td.task-title {{ task.title }}
-        td {{ task.description }}
-        td.task-date {{ formatDate(task.dateTo) }}
-        td
-          img(src='../assets/img/delete.svg', @click='deleteTask(index)')
-    task-modal(v-if="isOpenModal" @close="isOpenModal = false" @onTaskChanged='addNewTask($event)')
+.tab-item.active-item
+  .tab-title Tasks
+  .form-container
+    h1(@click='isOpenModal = true') Add new task
+  table(v-if='tasks.length')
+    tr
+      th Title
+      th Description
+      th Date
+      th
+    tr(v-for='(task, index) in tasks' :key="`task-${index}`" ref="tableRow")
+      td.task-title {{ task.title }}
+      td {{ task.description }}
+      td.task-date {{formatDate(task.dateTo)}}
+      td
+        img(src='../assets/img/delete.svg', @click='deleteTask(task.id)')
+  task-modal(v-if="isOpenModal" @close="isOpenModal = false" @onTaskChanged='addNewTask($event)')
 </template>
 
 <script lang="ts">
-import formatDate from '@/mixins/formatDate';
 import {TaskInterface} from '@/types/task.interface';
 import TaskModal from '@/modals/TaskModal.vue';
-import TaskStatus from '@/core/enums/task-status.enum';
 import {mapGetters, mapMutations} from 'vuex';
+import {defineComponent} from 'vue';
+import moment from 'moment';
 
-export default formatDate.extend({
+export default defineComponent({
   name: 'Tasks',
   data() {
     return {
@@ -36,7 +36,7 @@ export default formatDate.extend({
   },
   components: {TaskModal},
   methods: {
-    ...mapMutations('tasks', ['addTask']),
+    ...mapMutations('tasks', ['addTask', 'removeTask']),
     addNewTask(data: TaskInterface) {
       const newTask = data;
       newTask.id = Math.floor(Math.random() * 1000);
@@ -44,8 +44,10 @@ export default formatDate.extend({
       this.isOpenModal = false;
     },
     deleteTask(i: number) {
-      this.tasks.splice(i, 1);
-      this.taskCounter = this.tasks.length;
+      this.removeTask(i);
+    },
+    formatDate(date: string): string {
+      return moment(date).format('YYYY-MM-DD');
     },
   },
   created() {
@@ -109,13 +111,13 @@ table {
 
 @keyframes textTransform {
   0% {
-    font-size: 16px;
+    transform: scale(1);
   }
   50% {
-    font-size: 18px;
+    transform: scale(1.1);
   }
   100% {
-    font-size: 16px;
+    transform: scale(1);
   }
 }
 @keyframes backgroundColor {

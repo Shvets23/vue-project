@@ -1,15 +1,15 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import tasksStore from '@/store/modules/tasks';
+import {createStore} from 'vuex';
+import tasksStore from './modules/tasks';
+import activitiesStore from './modules/activities';
+import filesStore from '@/store/modules/files';
 
-Vue.use(Vuex);
-
-export default new Vuex.Store({
+export default createStore({
   state: {},
   mutations: {},
-  getters: {},
   actions: {},
   modules: {
     tasks: tasksStore,
+    activities: activitiesStore,
+    files: filesStore,
   },
 });

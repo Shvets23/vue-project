@@ -1,25 +1,25 @@
 <template lang="pug">
 .container
   aside-bar(:notification='notificationsCount')
-    // /#aside
+  // /#aside
   .main-block
-    Header
+    the-header
     main
       .tab-content
         router-view(@selectedImg='notificationsCount = $event')
-  // /.main-block
+// /.main-block
 </template>
-<script lang="ts">
-import Header from '@/components/Header.vue';
-import AsideBar from '@/components/AsideBar.vue';
-import formatDate from '@/mixins/formatDate';
-import MessageType from '@/core/enums/message-type.enum';
 
-export default formatDate.extend({
+<script lang="ts">
+import {defineComponent} from 'vue';
+import TheHeader from '@/components/TheHeader.vue';
+import AsideBar from '@/components/AsideBar.vue';
+import MessageType from '@/core/enums/message-type.enum'; // @ is an alias to /src
+
+export default defineComponent({
   name: 'Home',
-  mixins: [formatDate],
   components: {
-    Header,
+    TheHeader,
     AsideBar,
   },
   data() {
