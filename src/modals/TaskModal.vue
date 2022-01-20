@@ -6,6 +6,9 @@
       .form-field.title(:class="{'not-active': !editMode}")
         label Title:
         input(v-model='newTask.title' :disabled='!editMode' @keyup='checkFormState()')
+      .form-field.title(:class="{'not-active': !editMode}")
+        label Date to:
+        input(v-model='newTask.dateTo' :disabled='!editMode' @keyup='checkFormState()' type="date")
       .form-field.description(:class="{'not-active': !editMode }")
         label Description:
         textarea(v-model='newTask.description' :disabled='!editMode'  @keyup='checkFormState()')

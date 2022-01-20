@@ -38,7 +38,7 @@ export default defineComponent({
   },
   created() {
     this.attributes = this.getTasks.map((el: any) => {
-      el.dates = new Date(el.dateTo);
+      el.dates = new Date(el.createdAt);
       el.customData = {
         title: el.title,
         description: el.description,

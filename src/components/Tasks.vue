@@ -52,7 +52,7 @@ export default defineComponent({
     ...mapMutations('tasks', ['addTask', 'removeTask']),
     addNewTask(data: TaskInterface) {
       const newTask = data;
-      newTask.dateTo = new Date().toISOString();
+      newTask.createdAt = new Date().toISOString();
       newTask.status = TaskStatus.TO_DO;
       newTask.id = Math.floor(Math.random() * 1000);
       this.addTask(newTask);
