@@ -9,7 +9,7 @@
       th Description
       th Date
       th
-    tr(v-for='(task, i) in tasks' :key="`task-${index}`"  :ref="el => { if (el) divs[i] = el }")
+    tr(v-for='(task, i) in tasks' :key="`task-${i}`"  :ref="el => { if (el) divs[i] = el }")
       td.task-title {{ task.title }}
       td {{ task.description }}
       td.task-date {{formatDate(task.dateTo)}}
@@ -73,7 +73,7 @@ export default defineComponent({
     ...mapGetters('tasks', ['getTasks']),
   },
   mounted() {
-    this.divs.forEach((el: Element, i: number) => {
+    this.divs.forEach((el: HTMLElement, i: number) => {
       setTimeout(() => {
         el.classList.value = 'animated';
       }, i * 500);
@@ -82,7 +82,7 @@ export default defineComponent({
   updated() {
     if (this.taskCounter < this.tasks.length) {
       this.taskCounter++;
-      this.divs.find((el: Element, i: number) => {
+      this.divs.find((el: HTMLElement, i: number) => {
         if (i === this.divs.length - 1) {
           el.classList.value = 'new-task';
         }
