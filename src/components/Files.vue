@@ -30,7 +30,6 @@ export default defineComponent({
   },
   created() {
     this.files = this.getFiles;
-    console.log(this.files, '1111');
   },
 });
 </script>
