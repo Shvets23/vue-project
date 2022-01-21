@@ -24,7 +24,7 @@
         |  ({{countInProgress}})
       draggable(v-model='tasksInProgress' group='people' @start='drag=true' @end='drag=false' item-key='id' @change='taskInProgressChange')
         template(#item='{element}')
-          task-card(:task='element' @onTaskChanged='onUpdateTask($event)')
+          task-card(:task='element')
     .tasks-column.done(:class="{active: isActiveDone}")
       .tasks-column__title Done
         |  ({{countDone}})

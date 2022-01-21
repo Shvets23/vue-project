@@ -10,7 +10,6 @@
 import {defineComponent} from 'vue';
 import TaskStatus from '@/core/enums/task-status.enum';
 import TaskModal from '@/modals/TaskModal.vue';
-import {TaskInterface} from '@/types/task.interface';
 import moment from 'moment';
 
 export default defineComponent({
@@ -50,8 +49,7 @@ export default defineComponent({
     openModal() {
       this.isOpenModal = true;
     },
-    updateTask(data: TaskInterface) {
-      this.$emit('onTaskChanged', data);
+    updateTask() {
       this.isOpenModal = false;
     },
   },

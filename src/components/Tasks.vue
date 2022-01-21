@@ -9,13 +9,13 @@
       th Description
       th Date
       th
-    tr(v-for='(task, i) in tasks' :key="`task-${i}`"  :ref="el => { if (el) divs[i] = el }")
+    tr(v-for='(task, i) in tasks' :key="`task-${i}`"  :ref="el => { if (el) divs[i] = el }" @click='openTaskModal(task)')
       td.task-title {{ task.title }}
       td {{ task.description }}
       td.task-date {{formatDate(task.dateTo)}}
       td
         img(src='../assets/img/delete.svg', @click='deleteTask(task.id)')
-  task-modal(v-if="isOpenModal" @close="isOpenModal = false" @onTaskChanged='addNewTask($event)')
+  task-modal(v-if="isOpenModal" @close="onTaskChange()" @onTaskChanged='onTaskChange()' :task='activeTask' :isNeedControls="true")
 </template>
 
 <script lang="ts">
@@ -45,18 +45,27 @@ export default defineComponent({
       isOpenModal: false,
       tasks: [] as TaskInterface[],
       taskCounter: 0,
+      activeTask: {},
+      defaultTask: {
+        title: '',
+        description: '',
+        createdAt: '',
+        dateTo: '',
+        status: TaskStatus.TO_DO,
+        id: '',
+      },
     };
   },
   components: {TaskModal},
   methods: {
-    ...mapMutations('tasks', ['addTask', 'removeTask']),
-    addNewTask(data: TaskInterface) {
-      const newTask = data;
-      newTask.createdAt = new Date().toISOString();
-      newTask.status = TaskStatus.TO_DO;
-      newTask.id = Math.floor(Math.random() * 1000);
-      this.addTask(newTask);
+    ...mapMutations('tasks', ['removeTask']),
+    onTaskChange() {
       this.isOpenModal = false;
+      this.activeTask = this.defaultTask;
+    },
+    openTaskModal(task: any) {
+      this.activeTask = task;
+      this.isOpenModal = true;
     },
     deleteTask(i: number) {
       this.removeTask(i);
@@ -68,6 +77,7 @@ export default defineComponent({
   created() {
     this.tasks = this.getTasks;
     this.taskCounter = this.tasks.length;
+    this.activeTask = this.defaultTask;
   },
   computed: {
     ...mapGetters('tasks', ['getTasks']),
@@ -107,6 +117,7 @@ table {
   }
   tr {
     transition: 0.5s;
+    cursor: pointer;
   }
   tr:nth-child(2n) {
     background: $lg;

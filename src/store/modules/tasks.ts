@@ -65,6 +65,7 @@ const tasksStore = {
           stateTask.title = task.title;
           stateTask.description = task.description;
           stateTask.status = task.status;
+          stateTask.dateTo = task.dateTo;
         }
       });
     },
