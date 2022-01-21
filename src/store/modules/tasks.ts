@@ -69,12 +69,8 @@ const tasksStore = {
         }
       });
     },
-    removeTask(state: TasksStoreInterface, id: number) {
-      state.tasksList.forEach((stateTask, i): void => {
-        if (stateTask.id === id) {
-          state.tasksList.splice(i, 1);
-        }
-      });
+    removeTask(state: TasksStoreInterface, i: number) {
+      state.tasksList.splice(i, 1);
     },
   },
   actions: {},

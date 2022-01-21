@@ -26,10 +26,11 @@ export default defineComponent({
   },
   components: {ComingSoon},
   computed: {
-    ...mapGetters('files', ['getFiles']),
+    ...mapGetters('activities', ['getFiles']),
   },
   created() {
     this.files = this.getFiles;
+    console.log(this.files, '1111');
   },
 });
 </script>

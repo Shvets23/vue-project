@@ -42,6 +42,15 @@ const activitiesStore = {
     getActivities(state: ActivitiesStoreInterface): MessageInterface[] {
       return state.messages;
     },
+    getFiles(state: ActivitiesStoreInterface): String[] {
+      let files = [] as String[];
+      state.messages.forEach((el) => {
+        if (el.images.length) {
+          files = files.concat(el.images);
+        }
+      });
+      return files;
+    },
   },
 };
 

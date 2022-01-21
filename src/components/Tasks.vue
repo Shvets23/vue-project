@@ -9,12 +9,12 @@
       th Description
       th Date
       th
-    tr(v-for='(task, i) in tasks' :key="`task-${i}`"  :ref="el => { if (el) divs[i] = el }" @click='openTaskModal(task)')
-      td.task-title {{ task.title }}
-      td {{ task.description }}
+    tr(v-for='(task, i) in tasks' :key="`task-${i}`"  :ref="el => { if (el) divs[i] = el }")
+      td(@click='openTaskModal(task)').task-title {{ task.title }}
+      td(@click='openTaskModal(task)') {{ task.description }}
       td.task-date {{formatDate(task.dateTo)}}
       td
-        img(src='../assets/img/delete.svg', @click='deleteTask(task.id)')
+        img(src='../assets/img/delete.svg', @click='deleteTask(i)')
   task-modal(v-if="isOpenModal" @close="onTaskChange()" @onTaskChanged='onTaskChange()' :task='activeTask' :isNeedControls="true")
 </template>
 
