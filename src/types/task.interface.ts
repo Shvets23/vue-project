@@ -4,4 +4,5 @@ export interface TaskInterface {
   dateTo: string;
   status: number;
   id: number;
+  createdAt: string;
 }

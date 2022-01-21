@@ -2,7 +2,7 @@ enum MessageType {
   COMMENT = 'comment',
   MARK = 'mark',
   SYSTEM = 'system',
-  CONTENT = 'content'
+  CONTENT = 'content',
 }
 
-export default MessageType
+export default MessageType;

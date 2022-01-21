@@ -1,96 +1,102 @@
 <template lang="pug">
-  .tab-item.active-item
-    .tab-title Tasks
-    .form-container
-      h1(@click='isOpenModal = true') Add new task
-    table(v-if='tasks.length')
-      tr
-        th Title
-        th Description
-        th Date
-        th
-      tr(v-for='(task, index) in tasks' :key="`task-${index}`" ref="tableRow")
-        td.task-title {{ task.title }}
-        td {{ task.description }}
-        td.task-date {{ formatDate(task.dateTo) }}
-        td
-          img(src='../assets/img/delete.svg', @click='deleteTask(index)')
-    task-modal(v-if="isOpenModal" @close="isOpenModal = false" @onTaskChanged='addTask($event)')
+.tab-item.active-item
+  .tab-title Tasks
+  .form-container
+    h1(@click='isOpenModal = true') Add new task
+  table(v-if='tasks.length')
+    tr
+      th Title
+      th Description
+      th Date
+      th
+    tr(v-for='(task, i) in tasks' :key="`task-${i}`"  :ref="el => { if (el) divs[i] = el }")
+      td(@click='openTaskModal(task)').task-title {{ task.title }}
+      td(@click='openTaskModal(task)') {{ task.description }}
+      td.task-date {{formatDate(task.dateTo)}}
+      td
+        img(src='../assets/img/delete.svg', @click='deleteTask(i)')
+  task-modal(v-if="isOpenModal" @close="onTaskChange()" @onTaskChanged='onTaskChange()' :task='activeTask' :isNeedControls="true")
 </template>
 
 <script lang="ts">
-import formatDate from '@/mixins/formatDate';
 import {TaskInterface} from '@/types/task.interface';
 import TaskModal from '@/modals/TaskModal.vue';
+import {mapGetters, mapMutations} from 'vuex';
+import {defineComponent} from 'vue';
+import moment from 'moment';
+import {ref, reactive, onBeforeUpdate} from 'vue';
 import TaskStatus from '@/core/enums/task-status.enum';
 
-export default formatDate.extend({
+export default defineComponent({
+  setup() {
+    const list = reactive([1, 2, 3]);
+    const divs = ref([]);
+    onBeforeUpdate(() => {
+      divs.value = [];
+    });
+    return {
+      list,
+      divs,
+    };
+  },
   name: 'Tasks',
   data() {
     return {
       isOpenModal: false,
       tasks: [] as TaskInterface[],
       taskCounter: 0,
+      activeTask: {},
+      defaultTask: {
+        title: '',
+        description: '',
+        createdAt: '',
+        dateTo: '',
+        status: TaskStatus.TO_DO,
+        id: '',
+      },
     };
   },
   components: {TaskModal},
   methods: {
-    addTask(data: TaskInterface) {
-      const newTask = data;
-      newTask.id = Math.floor(Math.random() * 1000);
-      this.tasks.push(newTask);
+    ...mapMutations('tasks', ['removeTask']),
+    onTaskChange() {
       this.isOpenModal = false;
+      this.activeTask = this.defaultTask;
+    },
+    openTaskModal(task: any) {
+      this.activeTask = task;
+      this.isOpenModal = true;
     },
     deleteTask(i: number) {
-      this.tasks.splice(i, 1);
-      this.taskCounter = this.tasks.length;
+      this.removeTask(i);
+    },
+    formatDate(date: string): string {
+      return moment(date).format('YYYY-MM-DD');
     },
   },
   created() {
-    this.tasks = [
-      {
-        title: 'Add Reference',
-        description: 'All references should open in a new tab in browser. To view the reference, click on the eye',
-        dateTo: '2021-10-27T21:39:54.159Z',
-        status: TaskStatus.TO_DO,
-        id: 1,
-      },
-      {
-        title: 'Add Video',
-        description: 'All references should open in a new tab in browser. To view the reference, click on the eye',
-        dateTo: '2021-11-14T21:39:54.159Z',
-        status: TaskStatus.TO_DO,
-        id: 2,
-      },
-      {
-        title: 'Shared session',
-        description:
-          'This is the tab that relates to whether the session is shared (this is a sorting option for sessions',
-        dateTo: '2021-08-23T21:39:54.159Z',
-        status: 1,
-        id: 3,
-      },
-      {
-        title: 'Wait for start',
-        description: 'When the session has NOT been started yet, the user wont be allowed entering the system',
-        dateTo: '2021-05-07T21:39:54.159Z',
-        status: 2,
-        id: 4,
-      },
-    ];
+    this.tasks = this.getTasks;
     this.taskCounter = this.tasks.length;
+    this.activeTask = this.defaultTask;
+  },
+  computed: {
+    ...mapGetters('tasks', ['getTasks']),
   },
   mounted() {
-    this.tasks.forEach((el: TaskInterface, i: number) => {
+    this.divs.forEach((el: HTMLElement, i: number) => {
       setTimeout(() => {
-        (this as any).$refs.tableRow[i].classList.value = 'animated';
+        el.classList.value = 'animated';
       }, i * 500);
     });
   },
   updated() {
     if (this.taskCounter < this.tasks.length) {
       this.taskCounter++;
-      (this as any).$refs.tableRow[(this as any).$refs.tableRow.length - 1].classList.value = 'new-task';
+      this.divs.find((el: HTMLElement, i: number) => {
+        if (i === this.divs.length - 1) {
+          el.classList.value = 'new-task';
+        }
+      });
     }
   },
 });
@@ -111,6 +117,7 @@ table {
   }
   tr {
     transition: 0.5s;
+    cursor: pointer;
   }
   tr:nth-child(2n) {
     background: $lg;
@@ -134,13 +141,13 @@ table {
 
 @keyframes textTransform {
   0% {
-    font-size: 16px;
+    transform: scale(1);
   }
   50% {
-    font-size: 18px;
+    transform: scale(1.1);
   }
   100% {
-    font-size: 16px;
+    transform: scale(1);
   }
 }
 @keyframes backgroundColor {

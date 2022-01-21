@@ -1,19 +1,18 @@
 <template lang="pug">
-  .card-wrapper(:class="taskClasses")
-    .task-wrapper(@click='openModal()')
-      .task-title {{task.title}}
-      .task-date {{formatDate}}
-    task-modal(v-if="isOpenModal" @close="close()" @onTaskChanged='updateTask($event)' :task='task')
+.card-wrapper(:class="taskClasses")
+  .task-wrapper(@click='openModal()')
+    .task-title {{task.title}}
+    .task-date {{formatDate}}
+  task-modal(v-if="isOpenModal" @close="close()" @onTaskChanged='updateTask($event)' :task='task' :isNeedControls="true")
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import {defineComponent} from 'vue';
 import TaskStatus from '@/core/enums/task-status.enum';
 import TaskModal from '@/modals/TaskModal.vue';
-import {TaskInterface} from '@/types/task.interface';
 import moment from 'moment';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'TaskCard',
   data() {
     return {
@@ -22,15 +21,12 @@ export default Vue.extend({
       today: new Date(),
     };
   },
-  props: {
-    task: Object,
-    index: Number,
-  },
+  props: ['task', 'index'],
   components: {
     TaskModal,
   },
   computed: {
-    taskClasses() {
+    taskClasses(): any {
       return {
         failed: new Date() > new Date(this.task.dateTo) && this.task.status != TaskStatus.DONE,
         bg_grey: this.task.status === TaskStatus.TO_DO,
@@ -53,8 +49,7 @@ export default Vue.extend({
     openModal() {
       this.isOpenModal = true;
     },
-    updateTask(data: TaskInterface) {
-      this.$emit('onTaskChanged', data);
+    updateTask() {
       this.isOpenModal = false;
     },
   },

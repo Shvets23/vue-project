@@ -20,11 +20,11 @@ header
         router-link(:to='tab.url') {{tab.name}}
 </template>
 <script lang="ts">
-import Vue from 'vue';
+import {defineComponent} from 'vue';
 import {UserInterface} from '@/types/user.interface';
 import UserAvatar from '@/components/UserAvatar.vue';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Header',
   data() {
     return {

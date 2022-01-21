@@ -1,58 +1,66 @@
 <template lang="pug">
-  .modal-backdrop(@click.self="close()")
-    .modal
-      h2 Task details
-      form.form-container(@submit.prevent="saveChanges()")
-        .form-field.title(:class="{'not-active': !editMode}")
-          label Title:
-          input(v-model='newTask.title' :disabled='!editMode' @keyup='checkFormState()')
-        .form-field.description(:class="{'not-active': !editMode }")
-          label Description:
-          textarea(v-model='newTask.description' :disabled='!editMode'  @keyup='checkFormState()')
-        .button-wrapper
-          button.btn.cancel(@click="close()") Cancel
-          button.btn.btn-primary(type="submit" v-if='editMode && isChanged') Save
-          button.btn.btn-primary(@click="editMode = true" v-if='!editMode' ) Edit
+.modal-backdrop(@click.self="close()")
+  .modal
+    h2 Task details
+    form.form-container(@submit.prevent="saveChanges()")
+      .form-field.title(:class="{'not-active': !editMode}")
+        label Title:
+        input(v-model='newTask.title' :disabled='!editMode' @keyup='checkFormState()')
+      .form-field.title(:class="{'not-active': !editMode}" v-if='!task.id')
+        label Date to:
+        input( :disabled='!editMode' @keyup='checkFormState()' type="date" v-model="newTask.dateTo")
+      .form-field.description(:class="{'not-active': !editMode }")
+        label Description:
+        textarea(v-model='newTask.description' :disabled='!editMode'  @keyup='checkFormState()')
+      .button-wrapper
+        button.btn.cancel(@click="close()")
+          span(v-if="!isNeedControls") Cancel
+          span(v-if="isNeedControls") Close
+        button.btn.btn-primary(type="submit" v-if='editMode && isChanged || !task') Save
+        button.btn.btn-primary(@click="editMode = true" v-if='!editMode && isNeedControls' ) Edit
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import {defineComponent} from 'vue';
+import {mapMutations} from 'vuex';
+import moment from 'moment';
 import TaskStatus from '@/core/enums/task-status.enum';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'TaskModal',
-  props: {
-    task: {
-      type: Object,
-      default: function () {
-        return {
-          title: '',
-          description: '',
-          dateTo: new Date().toISOString(),
-          status: TaskStatus.TO_DO,
-          id: null,
-        };
-      },
-    },
-  },
+  props: ['task', 'isNeedControls'],
+  emits: ['close', 'onTaskChanged'],
   data() {
     return {
       editMode: false,
       defaultForm: Object.assign({}, this.task) as any,
       newTask: Object.assign({}, this.task) as any,
       isChanged: false,
+      tt: '14-01-2022',
     };
   },
   components: {},
   mounted() {
-    this.editMode = !!!this.task.id;
+    this.editMode = !this.task?.id;
   },
   methods: {
-    close(): void {
+    ...mapMutations('tasks', ['updateTask', 'addTask']),
+    close(): any {
       this.$emit('close');
     },
     saveChanges() {
-      this.$emit('onTaskChanged', this.newTask);
+      let task = Object.assign({}, this.newTask);
+      task.dateTo = new Date(task.dateTo).toISOString();
+      if (task.id) {
+        this.updateTask(task);
+      } else {
+        task.createdAt = new Date().toISOString();
+        task.status = TaskStatus.TO_DO;
+        task.id = Math.floor(Math.random() * 1000);
+        this.addTask(task);
+      }
+
+      this.$emit('onTaskChanged');
     },
     checkFormState() {
       for (let key in this.defaultForm) {

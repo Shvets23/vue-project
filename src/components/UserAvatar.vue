@@ -1,12 +1,12 @@
 <template lang="pug">
-  a(href='#')
-    img(:src='getImgUrl(user.avatar)' alt='user-avatar')
+a(href='#')
+  img(:src='getImgUrl(user.avatar)' alt='user-avatar')
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import {defineComponent} from 'vue';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'UserAvatar',
   props: {
     user: Object,
