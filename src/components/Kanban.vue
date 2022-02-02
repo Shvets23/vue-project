@@ -35,126 +35,124 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue';
+import {computed, defineComponent, ref, watch} from 'vue';
 import TaskStatus from '@/core/enums/task-status.enum';
 import TaskCard from '@/components/TaskCard.vue';
 import {TaskInterface} from '@/types/task.interface';
 import draggable from 'vuedraggable';
 import moment from 'moment';
-import {mapGetters, mapMutations, mapState} from 'vuex';
+import {mapGetters, mapMutations, useStore} from 'vuex';
 
 export default defineComponent({
   name: 'Kanban',
-  data() {
+  setup() {
+    const taskStatus = TaskStatus;
+    const tasksToDo = ref([]);
+    const tasksInProgress = ref([]);
+    const tasksDone = ref([]);
+    const searchKey = ref('');
+    const tasks = ref([]);
+    const filteredTasks = ref([]);
+    const dateTo = ref('');
+    const dateFrom = ref('');
+    const activeTab = ref(0);
+    const store = useStore();
+    tasks.value = store.getters['tasks/getTasks'];
+    filteredTasks.value = [...tasks.value];
+
+    const countInProgress = computed(() => {
+      return tasksInProgress.value.length;
+    });
+    const countToDo = computed(() => {
+      return tasksToDo.value.length;
+    });
+    const countDone = computed(() => {
+      return tasksDone.value.length;
+    });
+    const isActiveToDo = computed(() => {
+      return activeTab.value === TaskStatus.TO_DO;
+    });
+    const isActiveInProgress = computed(() => {
+      return activeTab.value === TaskStatus.IN_PROGRESS;
+    });
+    const isActiveDone = computed(() => {
+      return activeTab.value === TaskStatus.DONE;
+    });
+    const updateTask = (task: TaskInterface) => {
+      store.commit('tasks/updateTask', task);
+    };
+    const separateTasks = () => {
+      tasksToDo.value = filteredTasks.value.filter((el: any) => el.status === TaskStatus.TO_DO);
+      tasksInProgress.value = filteredTasks.value.filter((el: any) => el.status === TaskStatus.IN_PROGRESS);
+      tasksDone.value = filteredTasks.value.filter((el: any) => el.status === TaskStatus.DONE);
+    };
+    separateTasks();
+    const taskDoneChange = (data: any) => {
+      let task = Object.assign({}, data.added?.element);
+      task.status = TaskStatus.DONE;
+      updateTask(task);
+    };
+    const taskToDoChange = (data: any) => {
+      let task = Object.assign({}, data.added?.element);
+      task.status = TaskStatus.TO_DO;
+      updateTask(task);
+    };
+    const taskInProgressChange = (data: any) => {
+      let task = Object.assign({}, data.added?.element);
+      task.status = TaskStatus.IN_PROGRESS;
+      updateTask(task);
+    };
+    const filterTasks = () => {
+      filteredTasks.value = tasks.value.filter((task: TaskInterface) =>
+        task.title.match(new RegExp(searchKey.value, 'i')),
+      );
+      const temporaryTasks = [...filteredTasks.value];
+      if (!(dateTo.value && dateFrom.value)) return;
+      filteredTasks.value = temporaryTasks.filter((task: TaskInterface) => {
+        const taskDateMoment = moment(task.dateTo);
+        return (
+          taskDateMoment.isSameOrAfter(dateFrom.value, 'days') && taskDateMoment.isSameOrBefore(dateTo.value, 'days')
+        );
+      });
+    };
+    const clearFilters = () => {
+      searchKey.value = '';
+      dateFrom.value = '';
+      dateTo.value = '';
+    };
+    const changeActiveTab = (tabIndex: number): void => {
+      activeTab.value = tabIndex;
+    };
+    watch(tasks, separateTasks);
+    watch(filteredTasks, separateTasks);
+    watch(searchKey, filterTasks);
+    watch(dateFrom, filterTasks);
+    watch(dateTo, filterTasks);
+
     return {
-      taskStatus: TaskStatus,
-      tasksToDo: [] as TaskInterface[],
-      tasksInProgress: [] as TaskInterface[],
-      tasksDone: [] as TaskInterface[],
-      currentTask: null,
-      today: new Date(),
-      searchKey: '',
-      tasks: [] as TaskInterface[],
-      filteredTasks: [] as TaskInterface[],
-      dateTo: '',
-      dateFrom: '',
-      activeTab: 0,
+      countToDo,
+      countInProgress,
+      countDone,
+      changeActiveTab,
+      clearFilters,
+      taskInProgressChange,
+      taskToDoChange,
+      taskDoneChange,
+      taskStatus,
+      searchKey,
+      dateFrom,
+      dateTo,
+      isActiveToDo,
+      isActiveInProgress,
+      isActiveDone,
+      tasksToDo,
+      tasksInProgress,
+      tasksDone,
     };
   },
   components: {
     TaskCard,
     draggable,
-  },
-  props: {
-    msg: String,
-  },
-  created(): void {
-    this.tasks = this.getTasks;
-    this.filteredTasks = [...this.tasks];
-  },
-  watch: {
-    tasks() {
-      this.separateTasks();
-    },
-    filteredTasks() {
-      this.separateTasks();
-    },
-    searchKey() {
-      this.filterTasks();
-    },
-    dateFrom() {
-      this.filterTasks();
-    },
-    dateTo() {
-      this.filterTasks();
-    },
-  },
-  computed: {
-    ...mapGetters('tasks', ['getTasks']),
-
-    countToDo(): number {
-      return this.tasksToDo.length;
-    },
-    countInProgress(): number {
-      return this.tasksInProgress.length;
-    },
-    countDone(): number {
-      return this.tasksDone.length;
-    },
-    isActiveToDo(): boolean {
-      return this.activeTab === TaskStatus.TO_DO;
-    },
-    isActiveInProgress(): boolean {
-      return this.activeTab === TaskStatus.IN_PROGRESS;
-    },
-    isActiveDone(): boolean {
-      return this.activeTab === TaskStatus.DONE;
-    },
-  },
-  methods: {
-    ...mapMutations('tasks', ['updateTask']),
-    separateTasks() {
-      this.tasksToDo = this.filteredTasks.filter((el) => el.status === TaskStatus.TO_DO);
-      this.tasksInProgress = this.filteredTasks.filter((el) => el.status === TaskStatus.IN_PROGRESS);
-      this.tasksDone = this.filteredTasks.filter((el) => el.status === TaskStatus.DONE);
-    },
-    taskDoneChange(data: any) {
-      let task = Object.assign({}, data.added?.element);
-      task.status = TaskStatus.DONE;
-      this.updateTask(task);
-    },
-    taskToDoChange(data: any) {
-      let task = Object.assign({}, data.added?.element);
-      task.status = TaskStatus.TO_DO;
-      this.updateTask(task);
-    },
-    taskInProgressChange(data: any) {
-      let task = Object.assign({}, data.added?.element);
-      task.status = TaskStatus.IN_PROGRESS;
-      this.updateTask(task);
-    },
-    onUpdateTask(task: any) {
-      this.updateTask(task);
-    },
-    filterTasks(): void {
-      this.filteredTasks = this.tasks.filter((task) => task.title.match(new RegExp(this.searchKey, 'i')));
-      const temporaryTasks = [...this.filteredTasks];
-      if (!(this.dateTo && this.dateFrom)) return;
-      this.filteredTasks = temporaryTasks.filter((task) => {
-        const taskDateMoment = moment(task.dateTo);
-        return (
-          taskDateMoment.isSameOrAfter(this.dateFrom, 'days') && taskDateMoment.isSameOrBefore(this.dateTo, 'days')
-        );
-      });
-    },
-    clearFilters() {
-      this.searchKey = '';
-      this.dateFrom = '';
-      this.dateTo = '';
-    },
-    changeActiveTab(tabIndex: number): void {
-      this.activeTab = tabIndex;
-    },
   },
 });
 </script>

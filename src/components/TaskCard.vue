@@ -1,57 +1,50 @@
 <template lang="pug">
 .card-wrapper(:class="taskClasses")
-  .task-wrapper(@click='openModal()')
+  .task-wrapper(@click='openModal(task)')
     .task-title {{task.title}}
-    .task-date {{formatDate}}
-  task-modal(v-if="isOpenModal" @close="close()" @onTaskChanged='updateTask($event)' :task='task' :isNeedControls="true")
+    .task-date {{formatTaskDate(task.dateTo)}}
+  task-modal(v-if="isOpenModal" @close="onTaskChange()" @onTaskChanged='onTaskChange()' :task='task' :isNeedControls="true")
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue';
+import {computed, defineComponent} from 'vue';
 import TaskStatus from '@/core/enums/task-status.enum';
 import TaskModal from '@/modals/TaskModal.vue';
 import moment from 'moment';
+import openTaskModal from '@/composables/openModal';
+import formatDate from '@/composables/formatDate';
 
 export default defineComponent({
-  name: 'TaskCard',
-  data() {
+  setup(props) {
+    const {isOpenModal, openModal, onTaskChange} = openTaskModal();
+    const {formatTaskDate} = formatDate();
+    const taskStatus = TaskStatus;
+    const taskClasses = computed(() => {
+      return {
+        failed: new Date() > new Date(props.task.dateTo) && props.task.status != TaskStatus.DONE,
+        bg_grey: props.task.status === TaskStatus.TO_DO,
+        bg_blue: props.task.status === TaskStatus.IN_PROGRESS,
+        bg_green: props.task.status === TaskStatus.DONE,
+        expire:
+          moment(props.task.dateTo).diff(moment(), 'hours') < 24 &&
+          moment(props.task.dateTo).diff(moment(), 'hours') > 0 &&
+          props.task.status != TaskStatus.DONE,
+      };
+    });
+
     return {
-      taskStatus: TaskStatus,
-      isOpenModal: false,
-      today: new Date(),
+      isOpenModal,
+      openModal,
+      onTaskChange,
+      formatTaskDate,
+      taskClasses,
+      taskStatus,
     };
   },
+  name: 'TaskCard',
   props: ['task', 'index'],
   components: {
     TaskModal,
-  },
-  computed: {
-    taskClasses(): any {
-      return {
-        failed: new Date() > new Date(this.task.dateTo) && this.task.status != TaskStatus.DONE,
-        bg_grey: this.task.status === TaskStatus.TO_DO,
-        bg_blue: this.task.status === TaskStatus.IN_PROGRESS,
-        bg_green: this.task.status === TaskStatus.DONE,
-        expire:
-          moment(this.task.dateTo).diff(moment(), 'hours') < 24 &&
-          moment(this.task.dateTo).diff(moment(), 'hours') > 0 &&
-          this.task.status != TaskStatus.DONE,
-      };
-    },
-    formatDate(): string {
-      return moment(this.task.dateTo).format('YYYY-MM-DD');
-    },
-  },
-  methods: {
-    close() {
-      this.isOpenModal = false;
-    },
-    openModal() {
-      this.isOpenModal = true;
-    },
-    updateTask() {
-      this.isOpenModal = false;
-    },
   },
 });
 </script>

@@ -10,31 +10,21 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue';
-import ComingSoon from '@/components/ComingSoon.vue';
-import {mapGetters} from 'vuex';
+import {defineComponent, ref} from 'vue';
+import {useStore} from 'vuex';
 
 export default defineComponent({
-  name: 'Files',
-  data() {
+  setup() {
+    const store = useStore();
+    const files = ref([]);
+    files.value = store.getters['activities/getFiles'];
     return {
-      files: [],
+      files,
     };
   },
-  props: {
-    msg: String,
-  },
-  components: {ComingSoon},
-  computed: {
-    ...mapGetters('activities', ['getFiles']),
-  },
-  created() {
-    this.files = this.getFiles;
-  },
+  name: 'Files',
 });
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 table {
   margin: 0 auto;

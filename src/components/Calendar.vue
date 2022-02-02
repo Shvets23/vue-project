@@ -7,37 +7,26 @@
         .flex.flex-col.h-full.z-10.overflow-hidden
           span.day-label.text-sm.text-gray-900 {{ day.day }}
           .flex-grow.overflow-y-auto.overflow-x-auto
-            p.text-xs.leading-tight.rounded-sm.p-1.mt-0.mb-1(v-for='(attr, index) in attributes' :key='index' @click="openModal(attr)")
+            p.text-xs.leading-tight.rounded-sm.p-1.mt-0.mb-1(v-for='(attr, index) in attributes' :key='index' @click="openModal(attr.customData)")
               | {{ attr.customData.title }} {{ attr.title }}
-  task-modal(v-if="isOpenModal" @close="close()" :task='activeTask' :isNeedControls="false")
+  task-modal(v-if="isOpenModal" @close="onTaskChange()" :task='activeTask' :isNeedControls="false")
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue';
-import {mapGetters} from 'vuex';
+import {defineComponent, ref} from 'vue';
+import {useStore} from 'vuex';
 import TaskModal from '@/modals/TaskModal.vue';
+import openTaskModal from '@/composables/openModal';
 
 export default defineComponent({
-  name: 'Calendar',
-  props: {
-    msg: String,
-  },
-  components: {TaskModal},
-  data() {
-    return {
-      masks: {
-        weekdays: 'WWW',
-      },
-      attributes: [],
-      isOpenModal: false,
-      activeTask: null,
+  setup() {
+    const {isOpenModal, activeTask, openModal, onTaskChange} = openTaskModal();
+    const attributes = ref([]);
+    const store = useStore();
+    const masks = {
+      weekdays: 'WWW',
     };
-  },
-  computed: {
-    ...mapGetters('tasks', ['getTasks']),
-  },
-  created() {
-    this.attributes = this.getTasks.map((el: any) => {
+    attributes.value = store.getters['tasks/getTasks'].map((el: any) => {
       el.dates = new Date(el.createdAt);
       el.customData = {
         title: el.title,
@@ -46,20 +35,20 @@ export default defineComponent({
       };
       return el;
     });
+    return {
+      activeTask,
+      isOpenModal,
+      openModal,
+      onTaskChange,
+      attributes,
+      masks,
+    };
   },
-  methods: {
-    close() {
-      this.isOpenModal = false;
-    },
-    openModal(task: any) {
-      this.activeTask = task.customData;
-      this.isOpenModal = true;
-    },
-  },
+  name: 'Calendar',
+  components: {TaskModal},
 });
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 .tab-title {
   margin-bottom: 30px;
