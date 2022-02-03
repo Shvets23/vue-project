@@ -1,5 +1,6 @@
 import {ref} from 'vue';
 import TaskStatus from '@/core/enums/task-status.enum';
+import TasksService from '@/services/tasks.service';
 
 export default function openTaskModal() {
   let defaultTask = {

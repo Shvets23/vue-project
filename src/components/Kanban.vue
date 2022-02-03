@@ -18,19 +18,19 @@
         |  ({{countToDo}})
       draggable(v-model='tasksToDo' group='people' @start='drag=true' @end='drag=false' item-key='id' @change='taskToDoChange')
         template(#item='{element}')
-          task-card(:task='element')
+          task-card(:task='element' @onTaskEdit='onTaskEdit()')
     .tasks-column.in-progress(:class="{active: isActiveInProgress}")
       .tasks-column__title In Progress
         |  ({{countInProgress}})
       draggable(v-model='tasksInProgress' group='people' @start='drag=true' @end='drag=false' item-key='id' @change='taskInProgressChange')
         template(#item='{element}')
-          task-card(:task='element')
+          task-card(:task='element' @onTaskEdit='onTaskEdit()')
     .tasks-column.done(:class="{active: isActiveDone}")
       .tasks-column__title Done
         |  ({{countDone}})
       draggable(v-model='tasksDone' group='people' @start='drag=true' @end='drag=false' item-key='id' @change='taskDoneChange')
         template(#item='{element}')
-          task-card(:task='element')
+          task-card(:task='element' @onTaskEdit='onTaskEdit()')
 
 </template>
 
@@ -42,6 +42,7 @@ import {TaskInterface} from '@/types/task.interface';
 import draggable from 'vuedraggable';
 import moment from 'moment';
 import {mapGetters, mapMutations, useStore} from 'vuex';
+import TasksService from '@/services/tasks.service';
 
 export default defineComponent({
   name: 'Kanban',
@@ -57,9 +58,17 @@ export default defineComponent({
     const dateFrom = ref('');
     const activeTab = ref(0);
     const store = useStore();
-    tasks.value = store.getters['tasks/getTasks'];
-    filteredTasks.value = [...tasks.value];
-
+    // tasks.value = store.getters['tasks/getTasks'];
+    const getTasks = () => {
+      TasksService.getTasks().then((res: any) => {
+        tasks.value = res.data;
+        filteredTasks.value = [...tasks.value];
+      });
+    };
+    getTasks();
+    const onTaskEdit = () => {
+      getTasks();
+    };
     const countInProgress = computed(() => {
       return tasksInProgress.value.length;
     });
@@ -79,7 +88,10 @@ export default defineComponent({
       return activeTab.value === TaskStatus.DONE;
     });
     const updateTask = (task: TaskInterface) => {
-      store.commit('tasks/updateTask', task);
+      // store.commit('tasks/updateTask', task);
+      TasksService.updateTask(task).then((res) => {
+        getTasks();
+      });
     };
     const separateTasks = () => {
       tasksToDo.value = filteredTasks.value.filter((el: any) => el.status === TaskStatus.TO_DO);
@@ -93,14 +105,18 @@ export default defineComponent({
       updateTask(task);
     };
     const taskToDoChange = (data: any) => {
-      let task = Object.assign({}, data.added?.element);
-      task.status = TaskStatus.TO_DO;
-      updateTask(task);
+      if (data.added) {
+        let task = Object.assign({}, data.added?.element);
+        task.status = TaskStatus.TO_DO;
+        updateTask(task);
+      }
     };
     const taskInProgressChange = (data: any) => {
-      let task = Object.assign({}, data.added?.element);
-      task.status = TaskStatus.IN_PROGRESS;
-      updateTask(task);
+      if (data.added) {
+        let task = Object.assign({}, data.added?.element);
+        task.status = TaskStatus.IN_PROGRESS;
+        updateTask(task);
+      }
     };
     const filterTasks = () => {
       filteredTasks.value = tasks.value.filter((task: TaskInterface) =>
@@ -148,6 +164,7 @@ export default defineComponent({
       tasksToDo,
       tasksInProgress,
       tasksDone,
+      onTaskEdit,
     };
   },
   components: {

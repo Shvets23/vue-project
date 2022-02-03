@@ -3,7 +3,7 @@
   .task-wrapper(@click='openModal(task)')
     .task-title {{task.title}}
     .task-date {{formatTaskDate(task.dateTo)}}
-  task-modal(v-if="isOpenModal" @close="onTaskChange()" @onTaskChanged='onTaskChange()' :task='task' :isNeedControls="true")
+  task-modal(v-if="isOpenModal" @close="onTaskChange()" @onTaskChanged='onTaskChange(), onTaskEdit()' :task='task' :isNeedControls="true")
 </template>
 
 <script lang="ts">
@@ -15,7 +15,7 @@ import openTaskModal from '@/composables/openModal';
 import formatDate from '@/composables/formatDate';
 
 export default defineComponent({
-  setup(props) {
+  setup(props, {emit}) {
     const {isOpenModal, openModal, onTaskChange} = openTaskModal();
     const {formatTaskDate} = formatDate();
     const taskStatus = TaskStatus;
@@ -31,6 +31,9 @@ export default defineComponent({
           props.task.status != TaskStatus.DONE,
       };
     });
+    const onTaskEdit = () => {
+      emit('onTaskEdit', 'test');
+    };
 
     return {
       isOpenModal,
@@ -39,10 +42,12 @@ export default defineComponent({
       formatTaskDate,
       taskClasses,
       taskStatus,
+      onTaskEdit,
     };
   },
   name: 'TaskCard',
   props: ['task', 'index'],
+  emits: ['onTaskEdit'],
   components: {
     TaskModal,
   },

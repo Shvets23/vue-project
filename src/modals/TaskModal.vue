@@ -25,6 +25,7 @@ import {defineComponent} from 'vue';
 import {mapMutations} from 'vuex';
 import moment from 'moment';
 import TaskStatus from '@/core/enums/task-status.enum';
+import TasksService from '@/services/tasks.service';
 
 export default defineComponent({
   name: 'TaskModal',
@@ -52,12 +53,18 @@ export default defineComponent({
       let task = Object.assign({}, this.newTask);
       task.dateTo = new Date(task.dateTo).toISOString();
       if (task.id) {
-        this.updateTask(task);
+        // this.updateTask(task);
+        TasksService.updateTask(task).then(() => {
+          this.$emit('onTaskChanged');
+        });
       } else {
         task.createdAt = new Date().toISOString();
         task.status = TaskStatus.TO_DO;
         task.id = Math.floor(Math.random() * 1000);
-        this.addTask(task);
+        TasksService.createTask(task).then((res) => {
+          this.$emit('onTaskChanged');
+        });
+        // this.addTask(task);
       }
 
       this.$emit('onTaskChanged');
