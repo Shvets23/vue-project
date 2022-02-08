@@ -9,43 +9,34 @@
       th Description
       th Date
       th
-    tr(v-for='(task, i) in tasks' :key="`task-${i}`"  :ref="el => { if (el) divs[i] = el }")
+    tr(v-for='(task, i) in tasks' :key="`task-${i}`" :ref="el => { if (el) divs[i] = el }")
       td(@click='openModal(task)').task-title {{ task.title }}
       td(@click='openModal(task)') {{ task.description }}
       td.task-date {{formatTaskDate(task.dateTo)}}
       td
         img(src='../assets/img/delete.svg', @click='deleteTask(task.id)')
-  task-modal(v-if="isOpenModal" @close="onTaskChange()" @onTaskChanged='onTaskChange(), getTasks()' :task='activeTask' :isNeedControls="true")
+  task-modal(v-if="isOpenModal" @close="onTaskChange()" @onTaskChanged='onTaskChange(), onTaskAdded()' :task='activeTask' :isNeedControls="true")
 </template>
 
 <script lang="ts">
 import TaskModal from '@/modals/TaskModal.vue';
-import {useStore} from 'vuex';
-import {defineComponent} from 'vue';
+import {defineComponent, watch} from 'vue';
 import {ref, onBeforeUpdate, onMounted, onUpdated} from 'vue';
 import openTaskModal from '@/composables/openModal';
 import formatDate from '@/composables/formatDate';
-import TasksService from '@/services/tasks.service';
+import taskActions from '@/composables/taskComposable';
 
 export default defineComponent({
   setup() {
     const divs = ref([]);
-    const store = useStore();
-    let tasks: any = ref([]);
-    // tasks.value = store.getters['tasks/getTasks'];
-    let taskCounter = ref(0);
     const {isOpenModal, activeTask, openModal, onTaskChange} = openTaskModal();
+    const {tasks, getTask, deleteTask} = taskActions();
     const {formatTaskDate} = formatDate();
-
-    const getTasks = () => {
-      TasksService.getTasks().then((res) => {
-        tasks.value = res.data;
-        if (taskCounter.value === 0) {
-          taskCounter.value = tasks.value.length;
-        }
-      });
+    let taskCounter = ref(0);
+    getTask();
+    const onTaskAdded = () => {
+      taskCounter.value = taskCounter.value + 1;
     };
-    getTasks();
     onBeforeUpdate(() => {
       divs.value = [];
     });
@@ -56,26 +47,15 @@ export default defineComponent({
         }, i * 500);
       });
     });
-    onUpdated(() => {
-      if (taskCounter.value < tasks.value.length) {
-        taskCounter.value++;
-        divs.value.find((el: HTMLElement, i: number) => {
-          if (i === divs.value.length - 1) {
-            el.classList.value = 'new-task';
-          }
-        });
-      }
-    });
-
-    const deleteTask = (id: number) => {
-      taskCounter.value--;
-      TasksService.deleteTask(id).then((res) => {
-        getTasks();
+    onUpdated(() => {});
+    const addClass = () => {
+      divs.value.find((el: HTMLElement, i: number) => {
+        if (i === divs.value.length - 1) {
+          el.classList.value = 'new-task';
+        }
       });
-      // store.commit('tasks/removeTask', i);
-      // taskCounter.value--;
     };
-
+    watch(taskCounter, addClass);
     return {
       divs,
       tasks,
@@ -85,7 +65,8 @@ export default defineComponent({
       deleteTask,
       openModal,
       onTaskChange,
-      getTasks,
+      getTask,
+      onTaskAdded,
     };
   },
   name: 'Tasks',

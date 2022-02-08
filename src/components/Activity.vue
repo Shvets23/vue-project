@@ -20,7 +20,6 @@ import MessageType from '@/core/enums/message-type.enum';
 import {useStore} from 'vuex';
 import {defineComponent, ref} from 'vue';
 import formatDate from '@/composables/formatDate';
-import ActivityService from '@/services/activity.service';
 
 export default defineComponent({
   setup() {
@@ -28,10 +27,10 @@ export default defineComponent({
     const messageType = MessageType;
     const messages: any = ref([]);
     const store = useStore();
-    // messages.value = store.getters['activities/getActivities'];
-    ActivityService.getActivity().then((res) => {
-      messages.value = res.data;
+    store.dispatch('activities/getActivities').then(() => {
+      messages.value = store.getters['activities/getActivities'];
     });
+
     return {
       formatTaskDate,
       messageType,

@@ -17,15 +17,18 @@ import {defineComponent, ref} from 'vue';
 import {useStore} from 'vuex';
 import TaskModal from '@/modals/TaskModal.vue';
 import openTaskModal from '@/composables/openModal';
+import taskActions from '@/composables/taskComposable';
 
 export default defineComponent({
   setup() {
     const {isOpenModal, activeTask, openModal, onTaskChange} = openTaskModal();
+    const {getTask, tasks} = taskActions();
     const attributes = ref([]);
     const store = useStore();
     const masks = {
       weekdays: 'WWW',
     };
+    getTask();
     attributes.value = store.getters['tasks/getTasks'].map((el: any) => {
       el.dates = new Date(el.createdAt);
       el.customData = {

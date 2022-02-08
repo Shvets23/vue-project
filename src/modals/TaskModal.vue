@@ -21,61 +21,55 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue';
-import {mapMutations} from 'vuex';
-import moment from 'moment';
+import {defineComponent, onMounted, ref} from 'vue';
 import TaskStatus from '@/core/enums/task-status.enum';
-import TasksService from '@/services/tasks.service';
+import taskActions from '@/composables/taskComposable';
 
 export default defineComponent({
   name: 'TaskModal',
   props: ['task', 'isNeedControls'],
   emits: ['close', 'onTaskChanged'],
-  data() {
-    return {
-      editMode: false,
-      defaultForm: Object.assign({}, this.task) as any,
-      newTask: Object.assign({}, this.task) as any,
-      isChanged: false,
-      tt: '14-01-2022',
-    };
-  },
-  components: {},
-  mounted() {
-    this.editMode = !this.task?.id;
-  },
-  methods: {
-    ...mapMutations('tasks', ['updateTask', 'addTask']),
-    close(): any {
-      this.$emit('close');
-    },
-    saveChanges() {
-      let task = Object.assign({}, this.newTask);
+  setup(props, {emit}) {
+    const {updateTask, createTask} = taskActions();
+    const defaultForm = Object.assign({}, props.task) as any;
+    let editMode = ref(false);
+
+    const newTask = Object.assign({}, props.task) as any;
+    let isChanged = ref(false);
+    const saveChanges = () => {
+      let task = Object.assign({}, newTask);
       task.dateTo = new Date(task.dateTo).toISOString();
       if (task.id) {
-        // this.updateTask(task);
-        TasksService.updateTask(task).then(() => {
-          this.$emit('onTaskChanged');
-        });
+        updateTask(task);
       } else {
         task.createdAt = new Date().toISOString();
         task.status = TaskStatus.TO_DO;
         task.id = Math.floor(Math.random() * 1000);
-        TasksService.createTask(task).then((res) => {
-          this.$emit('onTaskChanged');
-        });
-        // this.addTask(task);
+        createTask(task);
       }
-
-      this.$emit('onTaskChanged');
-    },
-    checkFormState() {
-      for (let key in this.defaultForm) {
-        if (this.defaultForm[key] != this.newTask[key]) {
-          this.isChanged = true;
+      emit('onTaskChanged');
+    };
+    onMounted(() => {
+      editMode.value = !props.task?.id;
+    });
+    const checkFormState = () => {
+      for (let key in defaultForm) {
+        if (defaultForm[key] != newTask[key]) {
+          isChanged.value = true;
         }
       }
-    },
+    };
+    const close = () => {
+      emit('close');
+    };
+    return {
+      saveChanges,
+      isChanged,
+      editMode,
+      close,
+      checkFormState,
+      newTask,
+    };
   },
 });
 </script>

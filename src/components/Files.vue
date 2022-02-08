@@ -17,7 +17,10 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const files = ref([]);
-    files.value = store.getters['activities/getFiles'];
+    store.dispatch('activities/getActivities').then(() => {
+      files.value = store.getters['activities/getFiles'];
+    });
+
     return {
       files,
     };
