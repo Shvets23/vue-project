@@ -9,96 +9,68 @@
       th Description
       th Date
       th
-    tr(v-for='(task, i) in tasks' :key="`task-${i}`"  :ref="el => { if (el) divs[i] = el }")
-      td(@click='openTaskModal(task)').task-title {{ task.title }}
-      td(@click='openTaskModal(task)') {{ task.description }}
-      td.task-date {{formatDate(task.dateTo)}}
+    tr(v-for='(task, i) in tasks' :key="`task-${i}`" :ref="el => { if (el) divs[i] = el }")
+      td(@click='openModal(task)').task-title {{ task.title }}
+      td(@click='openModal(task)') {{ task.description }}
+      td.task-date {{formatTaskDate(task.dateTo)}}
       td
-        img(src='../assets/img/delete.svg', @click='deleteTask(i)')
-  task-modal(v-if="isOpenModal" @close="onTaskChange()" @onTaskChanged='onTaskChange()' :task='activeTask' :isNeedControls="true")
+        img(src='../assets/img/delete.svg', @click='deleteTask(task.id)')
+  task-modal(v-if="isOpenModal" @close="onTaskChange()" @onTaskChanged='onTaskChange(), onTaskAdded()' :task='activeTask' :isNeedControls="true")
 </template>
 
 <script lang="ts">
-import {TaskInterface} from '@/types/task.interface';
 import TaskModal from '@/modals/TaskModal.vue';
-import {mapGetters, mapMutations} from 'vuex';
-import {defineComponent} from 'vue';
-import moment from 'moment';
-import {ref, reactive, onBeforeUpdate} from 'vue';
-import TaskStatus from '@/core/enums/task-status.enum';
+import {defineComponent, watch} from 'vue';
+import {ref, onBeforeUpdate, onMounted, onUpdated} from 'vue';
+import openTaskModal from '@/composables/openModal';
+import formatDate from '@/composables/formatDate';
+import taskActions from '@/composables/taskComposable';
 
 export default defineComponent({
   setup() {
-    const list = reactive([1, 2, 3]);
     const divs = ref([]);
+    const {isOpenModal, activeTask, openModal, onTaskChange} = openTaskModal();
+    const {tasks, getTask, deleteTask} = taskActions();
+    const {formatTaskDate} = formatDate();
+    let taskCounter = ref(0);
+    getTask();
+    const onTaskAdded = () => {
+      taskCounter.value = taskCounter.value + 1;
+    };
     onBeforeUpdate(() => {
       divs.value = [];
     });
-    return {
-      list,
-      divs,
-    };
-  },
-  name: 'Tasks',
-  data() {
-    return {
-      isOpenModal: false,
-      tasks: [] as TaskInterface[],
-      taskCounter: 0,
-      activeTask: {},
-      defaultTask: {
-        title: '',
-        description: '',
-        createdAt: '',
-        dateTo: '',
-        status: TaskStatus.TO_DO,
-        id: '',
-      },
-    };
-  },
-  components: {TaskModal},
-  methods: {
-    ...mapMutations('tasks', ['removeTask']),
-    onTaskChange() {
-      this.isOpenModal = false;
-      this.activeTask = this.defaultTask;
-    },
-    openTaskModal(task: any) {
-      this.activeTask = task;
-      this.isOpenModal = true;
-    },
-    deleteTask(i: number) {
-      this.removeTask(i);
-    },
-    formatDate(date: string): string {
-      return moment(date).format('YYYY-MM-DD');
-    },
-  },
-  created() {
-    this.tasks = this.getTasks;
-    this.taskCounter = this.tasks.length;
-    this.activeTask = this.defaultTask;
-  },
-  computed: {
-    ...mapGetters('tasks', ['getTasks']),
-  },
-  mounted() {
-    this.divs.forEach((el: HTMLElement, i: number) => {
-      setTimeout(() => {
-        el.classList.value = 'animated';
-      }, i * 500);
+    onMounted(() => {
+      divs.value.forEach((el: HTMLElement, i: number) => {
+        setTimeout(() => {
+          el.classList.value = 'animated';
+        }, i * 500);
+      });
     });
-  },
-  updated() {
-    if (this.taskCounter < this.tasks.length) {
-      this.taskCounter++;
-      this.divs.find((el: HTMLElement, i: number) => {
-        if (i === this.divs.length - 1) {
+    onUpdated(() => {});
+    const addClass = () => {
+      divs.value.find((el: HTMLElement, i: number) => {
+        if (i === divs.value.length - 1) {
           el.classList.value = 'new-task';
         }
       });
-    }
+    };
+    watch(taskCounter, addClass);
+    return {
+      divs,
+      tasks,
+      activeTask,
+      isOpenModal,
+      formatTaskDate,
+      deleteTask,
+      openModal,
+      onTaskChange,
+      getTask,
+      onTaskAdded,
+    };
   },
+  name: 'Tasks',
+  components: {TaskModal},
 });
 </script>
 

@@ -20,77 +20,55 @@ header
         router-link(:to='tab.url') {{tab.name}}
 </template>
 <script lang="ts">
-import {defineComponent} from 'vue';
-import {UserInterface} from '@/types/user.interface';
+import {defineComponent, ref} from 'vue';
 import UserAvatar from '@/components/UserAvatar.vue';
+import {useStore} from 'vuex';
 
 export default defineComponent({
   name: 'Header',
-  data() {
+  setup() {
+    const currentUrl = ref('');
+    const store = useStore();
+    const tabsList = [
+      {
+        name: 'Tasks',
+        id: 1,
+        url: '/tasks',
+      },
+      {
+        name: 'Kanban',
+        id: 2,
+        url: '/kanban',
+      },
+      {
+        name: 'Activity',
+        id: 3,
+        url: '/activity',
+      },
+      {
+        name: 'Calendar',
+        id: 4,
+        url: '/calendar',
+      },
+      {
+        name: 'Files',
+        id: 5,
+        url: '/files',
+      },
+    ];
+    const users = store.getters['users/getUsers'];
+    const onTabChange = (url: string) => {
+      currentUrl.value = url;
+    };
+    currentUrl.value = window.location.pathname;
     return {
-      currentUrl: '',
-      tabsList: [
-        {
-          name: 'Tasks',
-          id: 1,
-          url: '/tasks',
-        },
-        {
-          name: 'Kanban',
-          id: 2,
-          url: '/kanban',
-        },
-        {
-          name: 'Activity',
-          id: 3,
-          url: '/activity',
-        },
-        {
-          name: 'Calendar',
-          id: 4,
-          url: '/calendar',
-        },
-        {
-          name: 'Files',
-          id: 5,
-          url: '/files',
-        },
-      ],
-      users: [
-        {
-          id: 1,
-          userName: 'Test User',
-          openedTasks: 0,
-          completedTasks: 1,
-          avatar: 'girl2.jpeg',
-        },
-        {
-          id: 2,
-          userName: 'Test User',
-          openedTasks: 0,
-          completedTasks: 1,
-          avatar: 'girl3.jpg',
-        },
-        {
-          id: 3,
-          userName: 'Test User',
-          openedTasks: 0,
-          completedTasks: 1,
-          avatar: 'man.jpg',
-        },
-      ] as UserInterface[],
-      activeTab: 3,
+      users,
+      tabsList,
+      currentUrl,
+      onTabChange,
     };
   },
   components: {UserAvatar},
-  methods: {
-    onTabChange(url: string) {
-      this.currentUrl = url;
-    },
-  },
-  created() {
-    this.currentUrl = window.location.pathname;
-  },
 });
 </script>
 <style scoped lang="scss">

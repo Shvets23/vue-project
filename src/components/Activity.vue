@@ -8,7 +8,7 @@
         .icon.icon-mess(v-if='message.type == messageType.COMMENT')
         .icon.icon-upload(v-if='message.type == messageType.CONTENT')
         p(v-if='message.type != messageType.SYSTEM') {{ message.text }}
-      .activity-time(v-if='message.type != messageType.SYSTEM') {{ formatDate(message.createdAt) }}
+      .activity-time(v-if='message.type != messageType.SYSTEM') {{ formatTaskDate(message.createdAt) }}
     .mess-body(v-if='message.type == messageType.SYSTEM') {{ message.text }}
     .upload-files(v-if='message.type == messageType.CONTENT && message.images.length')
       .img-wrap(v-for='(img, index) in message.images' :key="`image-${index}`" @click="$emit('selectedImg', index)")
@@ -16,31 +16,26 @@
 </template>
 
 <script lang="ts">
-import formatDate from '@/mixins/formatDate';
 import MessageType from '@/core/enums/message-type.enum';
-import {mapGetters} from 'vuex';
-import {defineComponent} from 'vue';
-import moment from 'moment';
+import {useStore} from 'vuex';
+import {defineComponent, ref} from 'vue';
+import formatDate from '@/composables/formatDate';
 
 export default defineComponent({
-  name: 'Activity',
-  mixins: [formatDate],
-  data() {
+  setup() {
+    const {formatTaskDate} = formatDate();
+    const messageType = MessageType;
+    const messages: any = ref([]);
+    const store = useStore();
+    store.dispatch('activities/getActivities').then(() => {
+      messages.value = store.getters['activities/getActivities'];
+    });
+
     return {
-      messageType: MessageType,
-      messages: [],
+      formatTaskDate,
+      messageType,
+      messages,
     };
-  },
-  created() {
-    this.messages = this.getActivities;
-  },
-  computed: {
-    ...mapGetters('activities', ['getActivities']),
-  },
-  methods: {
-    formatDate(date: string): string {
-      return moment(date).format('YYYY-MM-DD');
-    },
   },
 });
 </script>

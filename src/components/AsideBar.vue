@@ -32,9 +32,11 @@ aside(id='aside', :class="{ 'open-aside': isAsideOpen }" )
 
 </template>
 <script lang="ts">
-import {defineComponent} from 'vue';
+import {defineComponent, ref} from 'vue';
 import {UserInterface} from '@/types/user.interface';
 import User from '@/components/User.vue';
+import {useStore} from 'vuex';
+import {useRouter, useRoute} from 'vue-router';
 
 export default defineComponent({
   name: 'AsideBar',
@@ -44,32 +46,29 @@ export default defineComponent({
   components: {
     User,
   },
-  methods: {
-    completeTask() {
-      this.currentUser.openedTasks ? this.navigateToTask() : alert('Sorry, you have no open tasks.');
-    },
-    changeTasksCount() {
-      if (confirm(this.confirmText)) {
-        this.currentUser.completedTasks++;
-        this.currentUser.openedTasks--;
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+    const isAsideOpen = ref(false);
+    const confirmText = 'Are you sure you want to change the number of tasks?';
+    const currentUser = ref(store.getters['users/getMe']);
+    const completeTask = () => {
+      currentUser.value.openedTasks ? navigateToTask() : alert('Sorry, you have no open tasks.');
+    };
+    const navigateToTask = () => {
+      router.push({path: '/tasks'});
+    };
+    const changeTasksCount = () => {
+      if (confirm(confirmText)) {
+        currentUser.value.completedTasks++;
+        currentUser.value.openedTasks--;
       }
-    },
-    navigateToTask() {
-      this.$router.push({path: '/tasks'});
-    },
-  },
-  data() {
+    };
     return {
-      isAsideOpen: false,
-      confirmText: 'Are you sure you want to change the number of tasks?',
-      currentUser: {
-        userName: 'Jean Gonzales',
-        userRole: 'Product Owner',
-        openedTasks: 5,
-        completedTasks: 375,
-        avatar: 'girl1.jpg',
-        id: 1,
-      } as UserInterface,
+      changeTasksCount,
+      completeTask,
+      currentUser,
+      isAsideOpen,
     };
   },
 });

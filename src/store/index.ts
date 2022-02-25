@@ -1,6 +1,7 @@
 import {createStore} from 'vuex';
 import tasksStore from './modules/tasks';
 import activitiesStore from './modules/activities';
+import usersStore from '@/store/modules/users';
 
 export default createStore({
   state: {},
@@ -9,5 +10,6 @@ export default createStore({
   modules: {
     tasks: tasksStore,
     activities: activitiesStore,
+    users: usersStore,
   },
 });
